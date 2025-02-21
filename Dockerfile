@@ -24,8 +24,7 @@ RUN apt-get update && \
     python3-venv \
     vim \
     ccache \
-    pre-commit \
-    sudo
+    pre-commit
 
 # Install bazel
 ARG ARCH="x86_64"
@@ -44,8 +43,7 @@ WORKDIR /src
 RUN groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    chown -R ${USER}:${GROUP} /src && \
-    echo "%sudo ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+    chown -R ${USER}:${GROUP} /src
 
 # Switch to user
 USER ${USER}
