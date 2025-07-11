@@ -1,5 +1,8 @@
-ARG BASE_IMG=ubuntu:22.04
+ARG BASE_IMG=ubuntu:24.04
 FROM ${BASE_IMG} AS dev-base
+
+# https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
+RUN userdel -r ubuntu
 
 # Specify user IDs
 ARG GROUP
@@ -13,18 +16,20 @@ USER root
 # Install basic packages
 RUN apt-get update && \
     apt-get install -y \
-    wget \
-    lld \
+    black \
+    ccache \
     clang \
     clang-format \
+    cmake \
     gdb \
-    black \
     git \
+    lld \
+    ninja \
+    pre-commit \
     python3-dev \
     python3-venv \
     vim \
-    ccache \
-    pre-commit
+    wget
 
 # Install bazel
 ARG ARCH="x86_64"
