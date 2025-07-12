@@ -23,8 +23,9 @@ RUN apt-get update && \
     cmake \
     gdb \
     git \
+    lcov \
     lld \
-    ninja \
+    ninja-build \
     pre-commit \
     python3-dev \
     python3-venv \
