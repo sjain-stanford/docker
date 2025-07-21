@@ -17,6 +17,7 @@ USER root
 RUN apt-get update && \
     apt-get install -y \
     black \
+    catch2 \
     ccache \
     clang \
     clang-format \
@@ -44,6 +45,12 @@ RUN apt-get clean \
 
 # Set workdir before launching container
 WORKDIR /src
+
+# Install python pip deps through an entrypoint script
+COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["/bin/bash"]
 
 # Add user permissions
 RUN groupadd -o -g ${GID} ${GROUP} && \
