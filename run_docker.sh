@@ -17,8 +17,13 @@ mkdir -p "${HOME}/.venv"
 mkdir -p "${HOME}/.cache"
 
 docker run -it \
+           # Mount the current directory to /src in the container 
            -v "$(pwd)":"/src" \
-           -v "${HOME}/.bashrc":"${HOME}/.bashrc" \
+           # Mount the virtual environment and cache directories
            -v "${HOME}/.venv":"${HOME}/.venv" \
            -v "${HOME}/.cache":"${HOME}/.cache" \
+           # Mount the user's bash configuration files
+           -v "${HOME}/.bashrc":"${HOME}/.bashrc" \
+           -v "${HOME}/.bash_aliases":"${HOME}/.bash_aliases" \
+           -v "${HOME}/.bash_profile":"${HOME}/.bash_profile" \
            main:dev
