@@ -16,13 +16,14 @@ docker build -f docker/Dockerfile \
 mkdir -p "${HOME}/.venv"
 mkdir -p "${HOME}/.cache"
 
+# Bind mounts for the following:
+# - current directory to /src in the container
+# - virtual environment and cache directories
+# - user's bash configuration files
 docker run -it \
-           # Mount the current directory to /src in the container 
            -v "$(pwd)":"/src" \
-           # Mount the virtual environment and cache directories
            -v "${HOME}/.venv":"${HOME}/.venv" \
            -v "${HOME}/.cache":"${HOME}/.cache" \
-           # Mount the user's bash configuration files
            -v "${HOME}/.bashrc":"${HOME}/.bashrc" \
            -v "${HOME}/.bash_aliases":"${HOME}/.bash_aliases" \
            -v "${HOME}/.bash_profile":"${HOME}/.bash_profile" \
