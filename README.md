@@ -18,3 +18,4 @@ All projects in the parent directory should now be visible (volume mounted) with
 
 - https://github.com/llvm/torch-mlir
 - https://github.com/llvm/mlir-tcp
+- https://github.com/nod-ai/shark-ai/tree/main/sharkfuser

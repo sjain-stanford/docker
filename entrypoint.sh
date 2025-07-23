@@ -14,8 +14,9 @@ source "${VENV_ACTIVATE_SCRIPT}"
 # Install pip dependencies
 python -m pip install --upgrade pip
 pip install \
-lit \
-filecheck
+filecheck \
+iree-base-compiler \
+lit
 
 # Add venv activation to .bashrc if not already present for interactive shells
 if ! grep -qF -- "source ${VENV_ACTIVATE_SCRIPT}" "${BASHRC_FILE}" 2>/dev/null; then
