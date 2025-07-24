@@ -4,11 +4,13 @@ FROM ${BASE_IMG} AS dev-base
 # https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
 RUN userdel -r ubuntu
 
-# Specify user IDs
+# Specify user IDs and recreate env in container
+# These are passed in from the run_docker.sh script
 ARG GROUP
 ARG GID
 ARG USER
 ARG UID
+ARG PWD
 
 # Run below commands as root
 USER root
@@ -44,7 +46,7 @@ RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Set workdir before launching container
-WORKDIR /src
+WORKDIR ${PWD}
 
 # Install python pip deps through an entrypoint script
 COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -56,7 +58,7 @@ CMD ["/bin/bash"]
 RUN groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    chown -R ${USER}:${GROUP} /src
+    chown -R ${USER}:${GROUP} ${PWD}
 
 # Switch to user
 USER ${USER}

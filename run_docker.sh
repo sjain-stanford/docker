@@ -6,12 +6,13 @@ docker build -f docker/Dockerfile \
              --build-arg GID=$(id -g) \
              --build-arg USER=$(id -un) \
              --build-arg UID=$(id -u) \
+             --build-arg PWD=$(pwd) \
              .
 
 # Bind mounts for the following:
-# - current directory to /src in the container
+# - current directory to same dir in the container
 # - user's HOME directory (useful for .bash*, .gitconfig, .venv, .cache etc)
 docker run -it \
-           -v "$(pwd)":"/src" \
+           -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
            main:dev
