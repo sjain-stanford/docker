@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 
 docker build -f docker/Dockerfile \
-             -t ubuntu-24.04-dev:latest \
+             -t sjainstanford/ubuntu-24.04-dev:latest \
              --build-arg GROUP=$(id -gn) \
              --build-arg GID=$(id -g) \
              --build-arg USER=$(id -un) \
              --build-arg UID=$(id -u) \
-             --build-arg PWD=$(pwd) \
+             --build-arg PWD=/src \
              .
 
+docker push sjainstanford/ubuntu-24.04-dev:latest
+
 # Bind mounts for the following:
-# - current directory to same dir in the container
+# - current directory to /src in the container
 # - user's HOME directory (useful for .bash*, .gitconfig, .venv, .cache etc)
 docker run -it \
-           -v "${PWD}":"${PWD}" \
+           -v "${PWD}":"/src" \
            -v "${HOME}":"${HOME}" \
-           ubuntu-24.04-dev:latest
+           sjainstanford/ubuntu-24.04-dev:latest
