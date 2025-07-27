@@ -10,7 +10,7 @@ ARG GROUP
 ARG GID
 ARG USER
 ARG UID
-ARG PWD
+ARG WORKDIR
 
 # Run below commands as root
 USER root
@@ -53,20 +53,25 @@ RUN wget -q https://github.com/iree-org/iree/releases/download/v3.6.0/iree-dist-
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
+# Install python venv and pip deps
+# Setting VIRTUAL_ENV and PATH are equivalent to activating the venv
+# https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+RUN python3 -m venv ${VIRTUAL_ENV}
+RUN pip install \
+    lit
+
 # Set workdir before launching container
-WORKDIR ${PWD}
+WORKDIR ${WORKDIR}
 
-# Install python pip deps through an entrypoint script
-COPY ./docker/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
-CMD ["/bin/bash"]
-
-# Add user permissions
+# Mirror user and group within container
+# and set ownerships
 RUN groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    chown -R ${USER}:${GROUP} ${PWD}
+    chown -R ${USER}:${GROUP} ${WORKDIR} && \
+    chown -R ${USER}:${GROUP} /opt/venv
 
 # Switch to user
 USER ${USER}

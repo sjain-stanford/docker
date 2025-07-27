@@ -6,7 +6,7 @@ docker build -f docker/Dockerfile \
              --build-arg GID=$(id -g) \
              --build-arg USER=$(id -un) \
              --build-arg UID=$(id -u) \
-             --build-arg PWD=$(pwd) \
+             --build-arg WORKDIR=$(pwd) \
              .
 
 # Bind mounts for the following:
