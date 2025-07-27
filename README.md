@@ -1,17 +1,28 @@
 # Interactive docker for compiler development
 
-Simply clone this repo (alongside other repos):
+Simply clone this repo:
 ```
 git clone https://github.com/sjain-stanford/docker.git
 ```
 
-Switch over to the parent directory and launch an interactive container:
+Switch over to the development repo and launch an interactive container:
 ```
-cd ../
-./docker/run_docker.sh
+/path/to/docker/run_docker.sh
 ```
 
-All code in the parent directory should be visible (volume mounted) within the container at the same paths, preserving the source structure to keep builds within container in sync with utilities outside (e.g. `compile_commands.json`, C++ Intellisense, gcov-viewer etc.). The container also mounts user's home directory so that their configuration works as-is within the container (e.g. `.bashrc`, `.gitconfig` etc). Even the python virtual environment is setup to persist between container attach/detach sessions.
+This launches an interactive shell within the container. All code in the current directory should be visible (volume mounted) within the container at the same paths, preserving the source structure to keep builds within container in sync with utilities outside (e.g. `compile_commands.json`, C++ Intellisense, gcov-viewer etc.). The container also mounts user's home directory so that their configuration works as-is within the container (e.g. `.bashrc`, `.gitconfig` etc).
+
+To execute commands within the container non-interactively:
+```
+/path/to/docker/exec_docker.sh <command>
+```
+
+For example:
+```
+/path/to/docker/exec_docker.sh echo "Hello World"
+
+/path/to/docker/exec_docker.sh bash -c "echo "Hello" && echo "World""
+```
 
 Happy development!
 

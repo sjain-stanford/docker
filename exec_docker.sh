@@ -9,7 +9,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # Bind mounts for the following:
 # - current directory to same dir in the container
 # - user's HOME directory (useful for .bash*, .gitconfig, .cache etc)
-docker run -it \
+docker run --rm \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
-           ubuntu-24.04-dev:latest
+           ubuntu-24.04-dev:latest \
+           "$@"
