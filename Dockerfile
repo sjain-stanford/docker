@@ -18,6 +18,7 @@ USER root
 # Install basic packages
 RUN apt-get update && \
     apt-get install -y \
+    bash-completion \
     black \
     catch2 \
     ccache \
