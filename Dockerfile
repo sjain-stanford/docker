@@ -42,6 +42,10 @@ ARG BAZEL_VERSION=6.4.0
 RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${ARCH} -O /usr/bin/bazel && \
     chmod a+x /usr/bin/bazel
 
+# Clean up
+RUN apt-get clean \
+  && rm -rf /var/lib/apt/lists/*
+
 # Install IREE runtime from source
 ARG IREE_GIT_TAG=3.7.0rc20250724
 RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git /opt/iree && \
@@ -63,10 +67,6 @@ RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-or
         -DIREE_HAL_DRIVER_HIP=ON && \
     cmake --build build --target all
 
-# Clean up
-RUN apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
-
 # Install python venv and pip deps
 # Setting VIRTUAL_ENV and PATH are equivalent to activating the venv
 # https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
@@ -77,8 +77,7 @@ RUN pip install \
     filecheck \
     lit \
     --find-links https://iree.dev/pip-release-links.html \
-    iree-base-compiler==${IREE_GIT_TAG} \
-    iree-base-runtime==${IREE_GIT_TAG}
+    iree-base-compiler==${IREE_GIT_TAG}
 
 # Set workdir before launching container
 WORKDIR ${WORKDIR}
