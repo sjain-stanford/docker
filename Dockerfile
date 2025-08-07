@@ -46,7 +46,7 @@ RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSIO
 RUN apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
-# Install IREE runtime from source
+# Build IREE Runtime (from source)
 ARG IREE_GIT_TAG=3.7.0rc20250724
 RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git /opt/iree && \
     cd /opt/iree && \
