@@ -10,8 +10,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # - current directory to same dir in the container
 # - user's HOME directory (useful for .bash*, .gitconfig, .cache etc)
 docker run -it \
-           --device /dev/kfd \
-           --device /dev/dri \
+           $( [ -e /dev/kfd ] && echo "--device /dev/kfd" ) \
+           $( [ -e /dev/dri ] && echo "--device /dev/dri" ) \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
            ubuntu-24.04-dev:latest
