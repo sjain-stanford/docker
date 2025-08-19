@@ -53,6 +53,7 @@ RUN apt-get clean \
 ARG THEROCK_DIST=gfx94X-dcgpu-7.0.0rc20250818
 ENV THEROCK_DIR=/opt/therock-build
 ENV PATH="${THEROCK_DIR}/bin:${PATH}"
+ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${LD_LIBRARY_PATH}"
 RUN mkdir ${THEROCK_DIR} && \
     wget -q https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/therock-dist-linux-${THEROCK_DIST}.tar.gz -O ${THEROCK_DIR}/therock-dist-linux-${THEROCK_DIST}.tar.gz && \
     cd ${THEROCK_DIR} && \
@@ -78,7 +79,8 @@ RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-or
         -DIREE_HAL_DRIVER_DEFAULTS=OFF \
         -DIREE_HAL_DRIVER_LOCAL_SYNC=ON \
         -DIREE_HAL_DRIVER_LOCAL_TASK=ON \
-        -DIREE_HAL_DRIVER_HIP=ON && \
+        -DIREE_HAL_DRIVER_HIP=ON \
+        -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include && \
     cmake --build build --target all
 
 # Install python venv and pip deps
