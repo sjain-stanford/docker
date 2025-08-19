@@ -53,7 +53,13 @@ RUN apt-get clean \
 ARG THEROCK_DIST=gfx94X-dcgpu-7.0.0rc20250818
 ENV THEROCK_DIR=/opt/therock-build
 ENV PATH="${THEROCK_DIR}/bin:${PATH}"
-ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${LD_LIBRARY_PATH}"
+# Prefer appending, however the base image doesn't
+# declare LD_LIBRARY_PATH and using interpolation
+# syntax like so:
+#   ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${THEROCK_DIR:-}"
+# throws this warning:
+#   - UndefinedVar: Usage of undefined variable '$LD_LIBRARY_PATH' (line ...)
+ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
 RUN mkdir ${THEROCK_DIR} && \
     wget -q https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/therock-dist-linux-${THEROCK_DIST}.tar.gz -O ${THEROCK_DIR}/therock-dist-linux-${THEROCK_DIST}.tar.gz && \
     cd ${THEROCK_DIR} && \
