@@ -12,6 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 docker run --rm \
            $( [ -e /dev/kfd ] && echo "--device /dev/kfd" ) \
            $( [ -e /dev/dri ] && echo "--device /dev/dri" ) \
+           --group-add 44 --group-add 109 --group-add 992 \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
            ubuntu-24.04-dev:latest \
