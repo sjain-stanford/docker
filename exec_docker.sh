@@ -12,7 +12,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 docker run --rm \
            $( [ -e /dev/kfd ] && echo "--device /dev/kfd" ) \
            $( [ -e /dev/dri ] && echo "--device /dev/dri" ) \
-           --security-opt seccomp=unconfined \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
            ubuntu-24.04-dev:latest \
