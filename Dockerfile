@@ -11,9 +11,6 @@ ARG GID
 ARG USER
 ARG UID
 ARG WORKDIR
-# Group IDs for `render` and `video` groups (needed for exposing GPU devices on host)
-ARG RENDER_GID
-ARG VIDEO_GID
 
 # Run below commands as root
 USER root
@@ -110,15 +107,6 @@ RUN groupadd -o -g ${GID} ${GROUP} && \
     usermod -aG sudo ${USER} && \
     chown -R ${USER}:${GROUP} ${WORKDIR} && \
     chown -R ${USER}:${GROUP} /opt
-
-# Create `render` & `video` groups (unless they already exist) and add user to it.
-# ROCm requires accesses to the host’s /dev/kfd and /dev/dri/* device nodes owned
-# by the `render` and `video` groups. The groups’ GIDs in the container must match
-# the host’s to access the resources. The `-f` exit successfully if the group
-# already exists, and cancels -g if the GID is already used.
-RUN if [ -n "$RENDER_GID" ]; then groupadd -f -g "$RENDER_GID" render; else groupadd -f render; fi && \
-    if [ -n "$VIDEO_GID" ]; then groupadd -f -g "$VIDEO_GID" video; else groupadd -f video; fi && \
-    usermod -aG render,video ${USER}
 
 # Switch to user
 USER ${USER}
