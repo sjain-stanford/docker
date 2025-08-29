@@ -23,8 +23,8 @@ for DEV in /dev/kfd /dev/dri/*; do
   # Skip if not a character device
   # /dev/dri/by-path/ symlinks are ignored
   [[ -c "${DEV}" ]] || continue
-  DEVICE_GROUP_OPTS+=" --device=${DEV} --group-add=$(stat -c '%g' ${DEV})"
+  DOCKER_RUN_DEVICE_OPTS+=" --device=${DEV} --group-add=$(stat -c '%g' ${DEV})"
 done
 
 # Export for use by `run_docker.sh` and `exec_docker.sh`
-export DEVICE_GROUP_OPTS
+export DOCKER_RUN_DEVICE_OPTS
