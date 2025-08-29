@@ -10,6 +10,4 @@ docker build -f ${SCRIPT_DIR}/Dockerfile \
              --build-arg USER=$(id -un) \
              --build-arg UID=$(id -u) \
              --build-arg WORKDIR=$(pwd) \
-             --build-arg RENDER_GID=$(getent group render | cut -d: -f3) \
-             --build-arg VIDEO_GID=$(getent group video | cut -d: -f3) \
              .
