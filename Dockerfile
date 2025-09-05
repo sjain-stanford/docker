@@ -2,7 +2,7 @@ ARG BASE_IMG=ubuntu:24.04
 FROM ${BASE_IMG} AS dev-base
 
 # https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
-RUN userdel -r ubuntu
+RUN userdel -r ubuntu || true
 
 # Specify user IDs and recreate env in container
 # These are passed in from the build_docker.sh script
