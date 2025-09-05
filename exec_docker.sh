@@ -13,5 +13,5 @@ docker run --rm \
            ${DOCKER_RUN_DEVICE_OPTS} \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
-           ubuntu-24.04-dev:latest \
+           ubuntu-24.04-compiler-dev:latest \
            "$@"
