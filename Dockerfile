@@ -65,6 +65,8 @@ RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSIO
 # Install python venv and pip deps
 # Setting VIRTUAL_ENV and PATH are equivalent to activating the venv
 # https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+ARG IREE_GIT_TAG=3.7.0rc20250818
+ARG ROCM_GIT_TAG=7.0.0rc20250818
 ENV VIRTUAL_ENV=/opt/venv
 ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
 RUN python3 -m venv ${VIRTUAL_ENV}
@@ -73,11 +75,10 @@ RUN pip install \
     lit \
     --find-links https://iree.dev/pip-release-links.html \
     iree-base-compiler==${IREE_GIT_TAG} \
-    --index-url https://rocm.nightlies.amd.com/v2/gfx950-dcgpu/ \
-    rocm[libraries,devel]
+    --extra-index-url https://rocm.nightlies.amd.com/v2/gfx950-dcgpu/ \
+    rocm[libraries,devel]==${ROCM_GIT_TAG}
 
 # Build IREE Runtime (from source)
-ARG IREE_GIT_TAG=3.7.0rc20250818
 ENV IREE_DIR=/opt/iree
 RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git ${IREE_DIR} && \
     cd ${IREE_DIR} && \
@@ -98,18 +99,6 @@ RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-or
         -DIREE_HAL_DRIVER_HIP=ON && \
         # -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include && \
     cmake --build build --target all
-
-# Install python venv and pip deps
-# Setting VIRTUAL_ENV and PATH are equivalent to activating the venv
-# https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
-ENV VIRTUAL_ENV=/opt/venv
-ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
-RUN python3 -m venv ${VIRTUAL_ENV}
-RUN pip install \
-    filecheck \
-    lit \
-    --find-links https://iree.dev/pip-release-links.html \
-    iree-base-compiler==${IREE_GIT_TAG}
 
 # Set workdir before launching container
 WORKDIR ${WORKDIR}
