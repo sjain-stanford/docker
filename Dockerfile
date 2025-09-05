@@ -45,22 +45,36 @@ ARG BAZEL_VERSION=6.4.0
 RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${ARCH} -O /usr/bin/bazel && \
     chmod a+x /usr/bin/bazel
 
-# Install HIP/ROCm for GFX942 (from TheRock prebuilt dist)
-ARG THEROCK_DIST=gfx94X-dcgpu-7.0.0rc20250818
-ENV THEROCK_DIR=/opt/therock-build
-ENV PATH="${THEROCK_DIR}/bin:${PATH}"
-# Prefer appending, however the base image doesn't
-# declare LD_LIBRARY_PATH and using interpolation
-# syntax like so:
-#   ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${THEROCK_DIR:-}"
-# throws this warning:
-#   - UndefinedVar: Usage of undefined variable '$LD_LIBRARY_PATH' (line ...)
-ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
-RUN mkdir ${THEROCK_DIR} && \
-    wget -q https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/therock-dist-linux-${THEROCK_DIST}.tar.gz -O ${THEROCK_DIR}/therock-dist-linux-${THEROCK_DIST}.tar.gz && \
-    cd ${THEROCK_DIR} && \
-    tar -xf *.tar.gz && \
-    rm -f *.tar.gz
+# # Install HIP/ROCm for GFX942 (from TheRock prebuilt dist)
+# ARG THEROCK_DIST=gfx94X-dcgpu-7.0.0rc20250818
+# ENV THEROCK_DIR=/opt/therock-build
+# ENV PATH="${THEROCK_DIR}/bin:${PATH}"
+# # Prefer appending, however the base image doesn't
+# # declare LD_LIBRARY_PATH and using interpolation
+# # syntax like so:
+# #   ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${THEROCK_DIR:-}"
+# # throws this warning:
+# #   - UndefinedVar: Usage of undefined variable '$LD_LIBRARY_PATH' (line ...)
+# ENV LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
+# RUN mkdir ${THEROCK_DIR} && \
+#     wget -q https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/therock-dist-linux-${THEROCK_DIST}.tar.gz -O ${THEROCK_DIR}/therock-dist-linux-${THEROCK_DIST}.tar.gz && \
+#     cd ${THEROCK_DIR} && \
+#     tar -xf *.tar.gz && \
+#     rm -f *.tar.gz
+
+# Install python venv and pip deps
+# Setting VIRTUAL_ENV and PATH are equivalent to activating the venv
+# https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+ENV VIRTUAL_ENV=/opt/venv
+ENV PATH="${VIRTUAL_ENV}/bin:${PATH}"
+RUN python3 -m venv ${VIRTUAL_ENV}
+RUN pip install \
+    filecheck \
+    lit \
+    --find-links https://iree.dev/pip-release-links.html \
+    iree-base-compiler==${IREE_GIT_TAG} \
+    --index-url https://rocm.nightlies.amd.com/v2/gfx950-dcgpu/ \
+    rocm[libraries,devel]
 
 # Build IREE Runtime (from source)
 ARG IREE_GIT_TAG=3.7.0rc20250818
@@ -81,8 +95,8 @@ RUN git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-or
         -DIREE_HAL_DRIVER_DEFAULTS=OFF \
         -DIREE_HAL_DRIVER_LOCAL_SYNC=ON \
         -DIREE_HAL_DRIVER_LOCAL_TASK=ON \
-        -DIREE_HAL_DRIVER_HIP=ON \
-        -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include && \
+        -DIREE_HAL_DRIVER_HIP=ON && \
+        # -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include && \
     cmake --build build --target all
 
 # Install python venv and pip deps
