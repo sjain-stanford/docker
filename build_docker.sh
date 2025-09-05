@@ -10,7 +10,7 @@ docker build -f ${SCRIPT_DIR}/Dockerfile \
              --build-arg USER=$(id -un) \
              --build-arg UID=$(id -u) \
              --build-arg WORKDIR=$(pwd) \
-             .
+             ${SCRIPT_DIR}
 
 # ROCm requires accesses to the host’s /dev/kfd and /dev/dri/* device nodes, typically
 # owned by the `render` and `video` groups. The groups’ GIDs in the container must
