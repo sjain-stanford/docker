@@ -6,11 +6,12 @@ RUN userdel -r ubuntu || true
 
 # Specify user IDs and recreate env in container
 # These are passed in from the build_docker.sh script
-ARG GROUP
-ARG GID
-ARG USER
-ARG UID
-ARG WORKDIR
+# Defaults to root user when not specified
+ARG GROUP=root
+ARG GID=0
+ARG USER=root
+ARG UID=0
+ARG WORKDIR=/workspace
 
 # Run below commands as root
 USER root
@@ -34,17 +35,15 @@ RUN apt-get update && \
     python3-dev \
     python3-venv \
     vim \
-    wget
+    wget && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Install bazel
 ARG ARCH=x86_64
 ARG BAZEL_VERSION=6.4.0
 RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${ARCH} -O /usr/bin/bazel && \
     chmod a+x /usr/bin/bazel
-
-# Clean up
-RUN apt-get clean \
-  && rm -rf /var/lib/apt/lists/*
 
 # Install HIP/ROCm for GFX942 (from TheRock prebuilt dist)
 ARG THEROCK_DIST=gfx94X-dcgpu-7.0.0rc20250818
@@ -102,10 +101,14 @@ RUN pip install \
 WORKDIR ${WORKDIR}
 
 # Mirror user and group within container and set ownerships
-RUN groupadd -o -g ${GID} ${GROUP} && \
+# only if building as non-root user (i.e., GROUP, GID, USER,
+# UID and WORKDIR are specified args to docker build)
+RUN if [ "$UID" != "0" ]; then \
+    groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    chown -R ${USER}:${GROUP} ${WORKDIR} /opt
+    chown -R ${USER}:${GROUP} ${WORKDIR} /opt; \
+    fi
 
 # Switch to user
 USER ${USER}
