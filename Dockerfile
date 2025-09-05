@@ -105,8 +105,7 @@ WORKDIR ${WORKDIR}
 RUN groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    chown -R ${USER}:${GROUP} ${WORKDIR} && \
-    chown -R ${USER}:${GROUP} /opt
+    chown -R ${USER}:${GROUP} ${WORKDIR} /opt
 
 # Switch to user
 USER ${USER}
