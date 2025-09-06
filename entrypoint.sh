@@ -8,15 +8,21 @@ IREE_DIR=${CACHE_DIR}/iree
 VENV_DIR=${CACHE_DIR}/venv
 
 # Version pins
-IREE_GIT_TAG=3.7.0rc20250818
-THEROCK_GIT_TAG=7.0.0rc20250818
+IREE_GIT_TAG=3.7.0rc20250905
+THEROCK_GIT_TAG=7.0.0rc20250905
 THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
+# This installation is cached locally at `${PWD}/.cache/docker` so re-runs are
+# instantaneous. However, the cache is NOT automatically invalidated and needs
+# to be cleared manually (like when library versions are bumped). To clear the
+# installation cache, simply remove the `${PWD}/.cache/docker` dir and re-run.
 if [ ! -f "${CACHE_DIR}/.install_complete" ]; then
     echo "entrypoint.sh: Cache NOT found at ${CACHE_DIR}, proceeding with installation..."
-    rm -rf ${CACHE_DIR}/*
     mkdir -p ${CACHE_DIR}
+    # Remove partial/corrupt cache contents that may have been
+    # populated without a `.install_complete`.
+    rm -rf ${CACHE_DIR}/*
 
     # Install TheRock (ROCm/HIP) for GFX942
     echo "entrypoint.sh: Downloading TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
