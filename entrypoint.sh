@@ -2,7 +2,7 @@
 set -e
 
 # Install dirs
-CACHE_DIR=${HOME}/.cache/docker
+CACHE_DIR=${PWD}/.cache/docker
 THEROCK_DIR=${CACHE_DIR}/therock
 IREE_DIR=${CACHE_DIR}/iree
 VENV_DIR=${CACHE_DIR}/venv
