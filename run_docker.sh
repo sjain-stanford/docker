@@ -12,8 +12,10 @@ source "${SCRIPT_DIR}/init_docker.sh"
 # Bind mounts for the following:
 # - current directory to same dir in the container
 # - user's HOME directory (useful for .bash*, .gitconfig, .cache etc)
+# https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#accessing-gpus-in-containers
 docker run -it \
-           ${DOCKER_RUN_DEVICE_OPTS} \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
+           ${DOCKER_RUN_DEVICE_OPTS} \
+           --security-opt seccomp=unconfined \
            compiler-dev-ubuntu-24.04:latest
