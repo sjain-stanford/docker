@@ -75,7 +75,8 @@ else
     echo "entrypoint.sh: Cache found at ${DOCKER_CACHE_DIR}, skipped installation..."
 fi
 
-# Set PATH and LD_LIBRARY_PATH via .bashrc for interactive shells and dev-containers
+# Set PATH and LD_LIBRARY_PATH via .bashrc for interactive shells.
+# This is useful for local development via `run_docker.sh` and VSCode's dev-containers.
 BASHRC_FILE="${HOME}/.bashrc"
 MARKER="# [Compiler Docker] Source VENV for PATH and LD_LIBRARY_PATH changes"
 if ! grep -qF -- "${MARKER}" "${BASHRC_FILE}" 2>/dev/null; then
@@ -89,6 +90,10 @@ if ! grep -qF -- "${MARKER}" "${BASHRC_FILE}" 2>/dev/null; then
 else
     echo "entrypoint.sh: Found VENV source activate in ${BASHRC_FILE}, skipped editing..."
 fi
+
+# Set PATH and LD_LIBRARY_PATH for non-interactive shells.
+# This is useful for batch runs via `exec_docker.sh` and CI.
+source /usr/local/bin/activate
 
 # Execute the command passed to the container
 exec "$@"

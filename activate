@@ -1,6 +1,12 @@
 # This file must be used with "source bin/activate" *from bash*
 # You cannot run it directly
 
+# Check if already activated to avoid double patching
+if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${PWD}/.cache/docker/venv" ]; then
+    # Already activated: skip reapplying PATH, LD_LIBRARY_PATH, PS1 etc.
+    return 0 2>/dev/null || exit 0
+fi
+
 deactivate () {
     # reset old environment variables
     if [ -n "${_OLD_VIRTUAL_PATH:-}" ] ; then
