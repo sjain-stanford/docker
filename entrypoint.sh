@@ -75,7 +75,7 @@ else
     echo "entrypoint.sh: Cache found at ${DOCKER_CACHE_DIR}, skipped installation..."
 fi
 
-# Export PATH and LD_LIBRARY_PATH in .bashrc for interactive shells and dev-containers
+# Set PATH and LD_LIBRARY_PATH via .bashrc for interactive shells and dev-containers
 BASHRC_FILE="${HOME}/.bashrc"
 MARKER="# [Compiler Docker] Source VENV for PATH and LD_LIBRARY_PATH changes"
 if ! grep -qF -- "${MARKER}" "${BASHRC_FILE}" 2>/dev/null; then
