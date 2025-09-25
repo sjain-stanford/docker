@@ -52,6 +52,7 @@ WORKDIR ${WORKDIR}
 # Install IREE, ROCm, HIP deps through an entrypoint script
 # to keep the base image small and portable.
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY activate /usr/local/bin/activate
 RUN chmod +x /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/bin/bash"]

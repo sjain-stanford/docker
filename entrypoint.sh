@@ -77,13 +77,12 @@ fi
 
 # Export PATH and LD_LIBRARY_PATH in .bashrc for interactive shells and dev-containers
 BASHRC_FILE="${HOME}/.bashrc"
-if ! grep -qF -- "[Compiler Docker] Setup PATH and LD_LIBRARY_PATH" "${BASHRC_FILE}" 2>/dev/null; then
-    echo "Adding PATH and LD_LIBRARY_PATH exports to ${BASHRC_FILE}"
-    echo -e "\n# [Compiler Docker] Setup PATH and LD_LIBRARY_PATH" >> "${BASHRC_FILE}"
-    # Setting PATH to ${VENV_DIR}/bin is equivalent to activating the venv
-    # https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
-    echo "export PATH=\"${VENV_DIR}/bin:${THEROCK_DIR}/bin:${PATH}\"" >> "${BASHRC_FILE}"
-    echo "export LD_LIBRARY_PATH=\"${THEROCK_DIR}/lib:${LD_LIBRARY_PATH}\"" >> "${BASHRC_FILE}"
+if ! grep -qF -- "[Compiler Docker] Source VENV for PATH and LD_LIBRARY_PATH changes" "${BASHRC_FILE}" 2>/dev/null; then
+    echo "entrypoint.sh: Adding VENV source activate to ${BASHRC_FILE}"
+    echo -e "\n# [Compiler Docker] Source VENV for PATH and LD_LIBRARY_PATH changes" >> "${BASHRC_FILE}"
+    echo "source /usr/local/bin/activate" >> "${BASHRC_FILE}"
+else
+    echo "entrypoint.sh: Found VENV source activate in ${BASHRC_FILE}, skipped editing..."
 fi
 
 # Execute the command passed to the container
