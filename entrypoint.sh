@@ -32,8 +32,6 @@ if [ ! -f "${CACHE_DIR}/.install_complete" ]; then
     echo "entrypoint.sh: Extracting TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
-    export PATH="${THEROCK_DIR}/bin:${PATH}"
-    export LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
 
     # Build IREE runtime from source
     echo "entrypoint.sh: Building IREE runtime from source..."
@@ -63,9 +61,7 @@ if [ ! -f "${CACHE_DIR}/.install_complete" ]; then
     # Install python virtual env and dependencies
     echo "entrypoint.sh: Setting up python venv and installing pip deps..."
     python3 -m venv ${VENV_DIR}
-    # Setting PATH to ${VENV_DIR}/bin is equivalent to activating the venv
-    # https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
-    export PATH="${VENV_DIR}/bin:${PATH}"
+    source ${VENV_DIR}/bin/activate
     pip install \
         filecheck \
         lit \
@@ -77,8 +73,17 @@ if [ ! -f "${CACHE_DIR}/.install_complete" ]; then
 
 else
     echo "entrypoint.sh: Cache found at ${CACHE_DIR}, skipped installation..."
-    export PATH="${VENV_DIR}/bin:${THEROCK_DIR}/bin:${PATH}"
-    export LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
+fi
+
+# Export PATH and LD_LIBRARY_PATH in .bashrc for interactive shells and dev-containers
+BASHRC_FILE="${HOME}/.bashrc"
+if ! grep -qF -- "[Compiler Docker] Setup PATH and LD_LIBRARY_PATH" "${BASHRC_FILE}" 2>/dev/null; then
+    echo "Adding PATH and LD_LIBRARY_PATH exports to ${BASHRC_FILE}"
+    echo -e "\n# [Compiler Docker] Setup PATH and LD_LIBRARY_PATH" >> "${BASHRC_FILE}"
+    # Setting PATH to ${VENV_DIR}/bin is equivalent to activating the venv
+    # https://pythonspeed.com/articles/activate-virtualenv-dockerfile/
+    echo "export PATH=\"${VENV_DIR}/bin:${THEROCK_DIR}/bin:${PATH}\"" >> "${BASHRC_FILE}"
+    echo "export LD_LIBRARY_PATH=\"${THEROCK_DIR}/lib:${LD_LIBRARY_PATH}\"" >> "${BASHRC_FILE}"
 fi
 
 # Execute the command passed to the container
