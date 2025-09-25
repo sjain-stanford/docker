@@ -13,17 +13,25 @@ deactivate () {
         export PYTHONHOME
         unset _OLD_VIRTUAL_PYTHONHOME
     fi
-
-    # Call hash to forget past commands. Without forgetting
-    # past commands the $PATH changes we made may not be respected
-    hash -r 2> /dev/null
-
+    if [ -n "${_OLD_VIRTUAL_LD_LIBRARY_PATH:-}" ] ; then
+        LD_LIBRARY_PATH="${_OLD_VIRTUAL_LD_LIBRARY_PATH:-}"
+        export LD_LIBRARY_PATH
+        unset _OLD_VIRTUAL_LD_LIBRARY_PATH
+    else
+        unset LD_LIBRARY_PATH
+    fi
     if [ -n "${_OLD_VIRTUAL_PS1:-}" ] ; then
         PS1="${_OLD_VIRTUAL_PS1:-}"
         export PS1
         unset _OLD_VIRTUAL_PS1
     fi
 
+    # Call hash to forget past commands. Without forgetting
+    # past commands the $PATH changes we made may not be respected
+    hash -r 2> /dev/null
+
+    unset DOCKER_CACHE_DIR
+    unset THEROCK_DIR
     unset VIRTUAL_ENV
     unset VIRTUAL_ENV_PROMPT
     if [ ! "${1:-}" = "nondestructive" ] ; then
@@ -35,11 +43,23 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-export VIRTUAL_ENV=${PWD}/.cache/docker/venv
+export DOCKER_CACHE_DIR=${PWD}/.cache/docker
+export THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
+export VIRTUAL_ENV=${DOCKER_CACHE_DIR}/venv
 
-_OLD_VIRTUAL_PATH="$PATH"
-PATH="$VIRTUAL_ENV/"bin":$PATH"
+# save old PATH and re-export
+_OLD_VIRTUAL_PATH="${PATH}"
+PATH="${VIRTUAL_ENV}/bin:${THEROCK_DIR}/bin:${PATH}"
 export PATH
+
+# save old LD_LIBRARY_PATH and re-export
+if [ -n "${LD_LIBRARY_PATH:-}" ] ; then
+    _OLD_VIRTUAL_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
+    LD_LIBRARY_PATH="${THEROCK_DIR}/lib:${LD_LIBRARY_PATH:-}"
+else
+    LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
+fi
+export LD_LIBRARY_PATH
 
 # unset PYTHONHOME if set
 # this will fail if PYTHONHOME is set to the empty string (which is bad anyway)
