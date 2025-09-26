@@ -3,7 +3,7 @@
 
 # Check if already activated to avoid double patching
 if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${PWD}/.cache/docker/venv" ]; then
-    # Already activated: skip reapplying PATH, LD_LIBRARY_PATH, PS1 etc.
+    # Already activated: skip overriding env variables and early return
     return 0 2>/dev/null || exit 0
 fi
 
