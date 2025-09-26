@@ -4,6 +4,9 @@
 # Check if already activated to avoid double patching
 if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${PWD}/.cache/docker/venv" ]; then
     # Already activated: skip overriding env variables and early return
+    # `return 0` tries to return from the script — this only works if the script is being sourced.
+    # `2>/dev/null` suppresses errors in case return is invalid (e.g., script is run, not sourced).
+    # If return fails, it falls back to `exit 0` to exit the script gracefully.
     return 0 2>/dev/null || exit 0
 fi
 
