@@ -63,7 +63,6 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     python3 -m venv ${VENV_DIR}
     source ${VENV_DIR}/bin/activate
     pip install \
-        filecheck \
         lit \
         --find-links https://iree.dev/pip-release-links.html \
         iree-base-compiler==${IREE_GIT_TAG}
