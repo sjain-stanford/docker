@@ -52,6 +52,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
+# CAUTION: These directories need to be kept in sync with the `entrypoint.sh` script!!
 export DOCKER_CACHE_DIR=${PWD}/.cache/docker
 export THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 export VIRTUAL_ENV=${DOCKER_CACHE_DIR}/venv
