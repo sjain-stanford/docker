@@ -2,6 +2,7 @@
 set -e
 
 # Install dirs
+# CAUTION: These directories need to be kept in sync with the `activate` script!!
 DOCKER_CACHE_DIR=${PWD}/.cache/docker
 VENV_DIR=${DOCKER_CACHE_DIR}/venv
 THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
@@ -61,11 +62,12 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     # Install python virtual env and dependencies
     echo "entrypoint.sh: Setting up python venv and installing pip deps..."
     python3 -m venv ${VENV_DIR}
-    source ${VENV_DIR}/bin/activate
+    source /usr/local/bin/activate
     pip install \
         lit \
         --find-links https://iree.dev/pip-release-links.html \
         iree-base-compiler==${IREE_GIT_TAG}
+    deactivate
 
     # Used to validate cache for future runs
     touch "${DOCKER_CACHE_DIR}/.install_complete"
