@@ -62,8 +62,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     # Install python virtual env and dependencies
     echo "[entrypoint.sh] Setting up python venv and installing pip deps..."
     python3 -m venv ${VENV_DIR}
-    source /usr/local/bin/activate
-    pip install \
+    ${VENV_DIR}/bin/pip install \
         lit \
         --find-links https://iree.dev/pip-release-links.html \
         iree-base-compiler==${IREE_GIT_TAG}
