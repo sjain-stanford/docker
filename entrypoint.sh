@@ -28,8 +28,9 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     # Install TheRock (ROCm/HIP) for GFX942
     echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
     mkdir -p ${THEROCK_DIR}
-    aria2c -x 16 -s 16 -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
-        https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/${THEROCK_TAR}
+    aria2c -x 16 -s 16 --max-tries=10 --retry-wait=5 \
+           -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
+           https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/${THEROCK_TAR}
     echo "[entrypoint.sh] Extracting TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
