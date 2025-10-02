@@ -38,8 +38,7 @@ RUN apt-get update && \
     vim \
     wget && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    ln -s /usr/lib/llvm-18/bin/FileCheck /usr/bin/FileCheck
+    rm -rf /var/lib/apt/lists/*
 
 # Install bazel
 ARG ARCH=x86_64
