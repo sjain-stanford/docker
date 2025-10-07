@@ -22,10 +22,12 @@ RUN apt-get update && \
     aria2 \
     bash-completion \
     black \
+    sudo \
     catch2 \
     ccache \
     clang \
     clang-format \
+    cmake-curses-gui \
     cmake \
     gdb \
     git \
@@ -64,6 +66,7 @@ RUN if [ "$UID" != "0" ]; then \
     groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
+    echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USER} && \
     chown -R ${USER}:${GROUP} ${WORKDIR}; \
     fi
 

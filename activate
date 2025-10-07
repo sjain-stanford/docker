@@ -1,8 +1,12 @@
 # This file must be used with "source bin/activate" *from bash*
 # You cannot run it directly
 
+# Variable passed to bin/activate by install command written into .bashrc during
+# cache creation.
+DOCKER_CACHE_BASE_DIR=${1}
+
 # Check if already activated to avoid double patching
-if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${PWD}/.cache/docker/venv" ]; then
+if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${DOCKER_CACHE_BASE_DIR}/.cache/docker/venv" ]; then
     # Already activated: skip overriding env variables and early return
     # `return 0` tries to return from the script — this only works if the script is being sourced.
     # `2>/dev/null` suppresses errors in case return is invalid (e.g., script is run, not sourced).
@@ -53,7 +57,7 @@ deactivate () {
 deactivate nondestructive
 
 # CAUTION: These directories need to be kept in sync with the `entrypoint.sh` script!!
-export DOCKER_CACHE_DIR=${PWD}/.cache/docker
+export DOCKER_CACHE_DIR=${DOCKER_CACHE_BASE_DIR}/.cache/docker
 export THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 export VIRTUAL_ENV=${DOCKER_CACHE_DIR}/venv
 

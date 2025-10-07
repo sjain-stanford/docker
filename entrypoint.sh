@@ -55,6 +55,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
             -DIREE_HAL_DRIVER_DEFAULTS=OFF \
             -DIREE_HAL_DRIVER_LOCAL_SYNC=ON \
             -DIREE_HAL_DRIVER_LOCAL_TASK=ON \
+            -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
             -DIREE_HAL_DRIVER_HIP=ON \
             -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include
         cmake --build build --target all
@@ -93,7 +94,8 @@ if [ -t 0 ]; then
         {
             echo -e "\n${MARKER}"
             echo "if [ -f /usr/local/bin/activate ]; then"
-            echo "    source /usr/local/bin/activate"
+            echo "    DOCKER_CACHE_BASE_DIR=\"${PWD}\""
+            echo "    source /usr/local/bin/activate \${DOCKER_CACHE_BASE_DIR}"
             echo "fi"
         } >> "${BASHRC_FILE}"
     else
