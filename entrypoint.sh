@@ -93,7 +93,8 @@ if [ -t 0 ]; then
         {
             echo -e "\n${MARKER}"
             echo "if [ -f /usr/local/bin/activate ]; then"
-            echo "    source /usr/local/bin/activate"
+            echo "    DOCKER_CACHE_BASE_DIR=\"${PWD}\""
+            echo "    source /usr/local/bin/activate \${DOCKER_CACHE_BASE_DIR}"
             echo "fi"
         } >> "${BASHRC_FILE}"
     else
