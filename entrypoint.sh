@@ -9,8 +9,8 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 IREE_DIR=${DOCKER_CACHE_DIR}/iree
 
 # Version pins
-IREE_GIT_TAG=3.8.0rc20251002
-THEROCK_GIT_TAG=7.9.0rc20251002
+IREE_GIT_TAG=3.8.0rc20251011
+THEROCK_GIT_TAG=7.10.0a20251011
 THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
@@ -26,17 +26,17 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     rm -rf ${DOCKER_CACHE_DIR}/*
 
     # Install TheRock (ROCm/HIP) for GFX942
-    echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
+    echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution ${THEROCK_DIST} at tag ${THEROCK_GIT_TAG}..."
     mkdir -p ${THEROCK_DIR}
     aria2c -x 16 -s 16 --max-tries=10 --retry-wait=5 \
            -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
            https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/${THEROCK_TAR}
-    echo "[entrypoint.sh] Extracting TheRock (ROCm/HIP) prebuilt distribution for GFX942..."
+    echo "[entrypoint.sh] Extracting TheRock (ROCm/HIP) prebuilt distribution..."
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
 
     # Build IREE runtime from source
-    echo "[entrypoint.sh] Building IREE runtime from source..."
+    echo "[entrypoint.sh] Building IREE runtime from source at tag ${IREE_GIT_TAG}..."
     git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git ${IREE_DIR}
     # Run this in a subshell to preserve $(pwd) for main shell
     (
