@@ -1,9 +1,9 @@
 # This file must be used with "source bin/activate" *from bash*
 # You cannot run it directly
 
-# Variable passed to bin/activate by install command written into .bashrc during
+# Variable passed to `bin/activate` by install command written into .bashrc during
 # cache creation.
-DOCKER_CACHE_BASE_DIR=${1}
+DOCKER_CACHE_BASE_DIR="$1"
 
 # Check if already activated to avoid double patching
 if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${DOCKER_CACHE_BASE_DIR}/.cache/docker/venv" ]; then
@@ -13,6 +13,8 @@ if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${DOCKER_CACHE_BASE_DIR}/.
     # If return fails, it falls back to `exit 0` to exit the script gracefully.
     return 0 2>/dev/null || exit 0
 fi
+
+echo "[activate] Activating VENV from docker cache at '${DOCKER_CACHE_BASE_DIR}/.cache/docker'..."
 
 deactivate () {
     # reset old environment variables

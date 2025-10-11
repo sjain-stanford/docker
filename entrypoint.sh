@@ -19,14 +19,14 @@ THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 # to be cleared manually (like when library versions are bumped). To clear the
 # installation cache, simply remove the `${PWD}/.cache/docker` dir and re-run.
 if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
-    echo "[entrypoint.sh] Cache NOT found at ${DOCKER_CACHE_DIR}, proceeding with installation..."
+    echo "[entrypoint.sh] Cache NOT found at '${DOCKER_CACHE_DIR}', proceeding with installation..."
     mkdir -p ${DOCKER_CACHE_DIR}
     # Remove partial/corrupt cache contents that may have been
     # populated without a `.install_complete`.
     rm -rf ${DOCKER_CACHE_DIR}/*
 
     # Install TheRock (ROCm/HIP) for GFX942
-    echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution ${THEROCK_DIST} at tag ${THEROCK_GIT_TAG}..."
+    echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution '${THEROCK_DIST}' at tag '${THEROCK_GIT_TAG}'..."
     mkdir -p ${THEROCK_DIR}
     aria2c -x 16 -s 16 --max-tries=10 --retry-wait=5 \
            -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
@@ -36,7 +36,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
 
     # Build IREE runtime from source
-    echo "[entrypoint.sh] Building IREE runtime from source at tag ${IREE_GIT_TAG}..."
+    echo "[entrypoint.sh] Building IREE runtime from source at tag '${IREE_GIT_TAG}'..."
     git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git ${IREE_DIR}
     # Run this in a subshell to preserve $(pwd) for main shell
     (
@@ -79,7 +79,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     touch "${DOCKER_CACHE_DIR}/.install_complete"
 
 else
-    echo "[entrypoint.sh] Cache found at ${DOCKER_CACHE_DIR}, skipped installation..."
+    echo "[entrypoint.sh] Cache found at '${DOCKER_CACHE_DIR}', skipped installation..."
 fi
 
 # Check if stdin is attached to a TTY (true for interactive run, false otherwise).
@@ -89,22 +89,27 @@ if [ -t 0 ]; then
     BASHRC_FILE="${HOME}/.bashrc"
     MARKER="# [Compiler Docker] Source VENV for PATH and LD_LIBRARY_PATH changes"
     if ! grep -qF -- "${MARKER}" "${BASHRC_FILE}" 2>/dev/null; then
-        echo "[entrypoint.sh] Interactive docker: Adding VENV source activate to ${BASHRC_FILE}"
+        echo "[entrypoint.sh] Interactive docker: Adding VENV source activate to '${BASHRC_FILE}'..."
         {
             echo -e "\n${MARKER}"
             echo "if [ -f /usr/local/bin/activate ]; then"
+            # This path is being cached here for supporting the VSCode Dev Container workflows
+            # where a container is launched once (triggering the bashrc update), and then attached
+            # to from different workspaces (and working directories). In such a scenario, the
+            # docker cache is populated at ${PWD} from the first container launch, and reused in
+            # subsequent workspaces through the cached path in the `.bashrc`.
             echo "    DOCKER_CACHE_BASE_DIR=\"${PWD}\""
             echo "    source /usr/local/bin/activate \${DOCKER_CACHE_BASE_DIR}"
             echo "fi"
         } >> "${BASHRC_FILE}"
     else
-        echo "[entrypoint.sh] Interactive docker: Found VENV source activate in ${BASHRC_FILE}, skipped editing..."
+        echo "[entrypoint.sh] Interactive docker: Found VENV source activate in '${BASHRC_FILE}', skipped editing..."
     fi
 else
   # Set PATH and LD_LIBRARY_PATH for non-interactive shells via direct `source activate`.
   # This is useful for batch runs (`exec_docker.sh`) and CI (`exec_docker_ci.sh`).
   echo "[entrypoint.sh] Non-interactive docker: Sourcing VENV activate now..."
-  source /usr/local/bin/activate
+  source /usr/local/bin/activate ${PWD}
 fi
 
 # Execute the command passed to the container
