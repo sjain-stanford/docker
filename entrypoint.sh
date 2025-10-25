@@ -11,7 +11,7 @@ IREE_DIR=${DOCKER_CACHE_DIR}/iree
 # Version pins
 IREE_GIT_TAG=3.9.0rc20251022
 THEROCK_GIT_TAG=7.10.0a20251022
-THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
+THEROCK_DIST=therock-dist-linux-gfx120X-all
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
 # This installation is cached locally at `${PWD}/.cache/docker` so re-runs are
