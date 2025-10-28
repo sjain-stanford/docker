@@ -27,6 +27,7 @@ RUN apt-get update && \
     ccache \
     clang \
     clang-format \
+    clang-tidy-19 \
     cmake-curses-gui \
     cmake \
     gdb \
