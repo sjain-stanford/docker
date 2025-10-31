@@ -9,8 +9,8 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 IREE_DIR=${DOCKER_CACHE_DIR}/iree
 
 # Version pins
-IREE_GIT_TAG=3.9.0rc20251022
-THEROCK_GIT_TAG=7.10.0a20251022
+IREE_GIT_TAG=3.9.0rc20251031
+THEROCK_GIT_TAG=7.10.0a20251031
 THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
@@ -43,7 +43,6 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
         cd ${IREE_DIR}
         git submodule update --init \
             third_party/hip-build-deps \
-            third_party/cpuinfo \
             third_party/benchmark \
             third_party/flatcc
         cmake -G Ninja -B build -S . \
