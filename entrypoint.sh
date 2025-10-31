@@ -70,10 +70,10 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     # Make FileCheck (from system llvm-18) and clang-20 (from TheRock) accessible in VENV
     ln -s /usr/lib/llvm-18/bin/FileCheck ${VENV_DIR}/bin/FileCheck
     ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-tidy ${VENV_DIR}/bin/clang-tidy
-    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-20 ${VENV_DIR}/bin/clang-20
-    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-20 ${VENV_DIR}/bin/clang++-20
-    ln -s ${VENV_DIR}/bin/clang-20 ${VENV_DIR}/bin/clang
-    ln -s ${VENV_DIR}/bin/clang++-20 ${VENV_DIR}/bin/clang++
+    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-21 ${VENV_DIR}/bin/clang-21
+    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-21 ${VENV_DIR}/bin/clang++-21
+    ln -s ${VENV_DIR}/bin/clang-21 ${VENV_DIR}/bin/clang
+    ln -s ${VENV_DIR}/bin/clang++-21 ${VENV_DIR}/bin/clang++
 
     # Used to validate cache for future runs
     touch "${DOCKER_CACHE_DIR}/.install_complete"
