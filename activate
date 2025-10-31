@@ -2,8 +2,8 @@
 # You cannot run it directly
 
 # Variable passed to `bin/activate` by install command written into .bashrc during
-# cache creation.
-DOCKER_CACHE_BASE_DIR="$1"
+# cache creation. Remove trailing slash from path for consistent path comparisons.
+DOCKER_CACHE_BASE_DIR="$(realpath "$1")"
 
 # Check if already activated to avoid double patching
 if [ -n "${VIRTUAL_ENV:-}" ] && [ "${VIRTUAL_ENV}" = "${DOCKER_CACHE_BASE_DIR}/.cache/docker/venv" ]; then
