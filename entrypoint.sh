@@ -9,8 +9,8 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 IREE_DIR=${DOCKER_CACHE_DIR}/iree
 
 # Version pins
-IREE_GIT_TAG=3.9.0rc20251031
-THEROCK_GIT_TAG=7.10.0a20251031
+IREE_GIT_TAG=3.9.0rc20251112
+THEROCK_GIT_TAG=7.10.0a20251112
 THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
@@ -67,13 +67,13 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
         --find-links https://iree.dev/pip-release-links.html \
         iree-base-compiler==${IREE_GIT_TAG}
 
-    # Make FileCheck (from system llvm-18) and clang-20 (from TheRock) accessible in VENV
+    # Make FileCheck (from system llvm-18) and clang-22 (from TheRock) accessible in VENV
     ln -s /usr/lib/llvm-18/bin/FileCheck ${VENV_DIR}/bin/FileCheck
     ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-tidy ${VENV_DIR}/bin/clang-tidy
-    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-21 ${VENV_DIR}/bin/clang-21
-    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-21 ${VENV_DIR}/bin/clang++-21
-    ln -s ${VENV_DIR}/bin/clang-21 ${VENV_DIR}/bin/clang
-    ln -s ${VENV_DIR}/bin/clang++-21 ${VENV_DIR}/bin/clang++
+    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-22 ${VENV_DIR}/bin/clang-22
+    ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-22 ${VENV_DIR}/bin/clang++-22
+    ln -s ${VENV_DIR}/bin/clang-22 ${VENV_DIR}/bin/clang
+    ln -s ${VENV_DIR}/bin/clang++-22 ${VENV_DIR}/bin/clang++
 
     # Used to validate cache for future runs
     touch "${DOCKER_CACHE_DIR}/.install_complete"
