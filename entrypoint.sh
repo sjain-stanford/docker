@@ -35,8 +35,8 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
 
-    # Build IREE runtime from source
-    echo "[entrypoint.sh] Building IREE runtime from source at tag '${IREE_GIT_TAG}'..."
+    # Clone IREE source
+    echo "[entrypoint.sh] Fetching IREE from source at tag '${IREE_GIT_TAG}'..."
     git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git ${IREE_DIR}
     # Run this in a subshell to preserve $(pwd) for main shell
     (
@@ -45,18 +45,6 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
             third_party/hip-build-deps \
             third_party/benchmark \
             third_party/flatcc
-        cmake -G Ninja -B build -S . \
-            -DIREE_VISIBILITY_HIDDEN=OFF \
-            -DIREE_BUILD_COMPILER=OFF \
-            -DIREE_BUILD_TESTS=OFF \
-            -DIREE_BUILD_SAMPLES=OFF \
-            -DIREE_ERROR_ON_MISSING_SUBMODULES=OFF \
-            -DIREE_HAL_DRIVER_DEFAULTS=OFF \
-            -DIREE_HAL_DRIVER_LOCAL_SYNC=ON \
-            -DIREE_HAL_DRIVER_LOCAL_TASK=ON \
-            -DIREE_HAL_DRIVER_HIP=ON \
-            -DHIP_API_HEADERS_ROOT=${THEROCK_DIR}/include
-        cmake --build build --target all
     )
 
     # Install python virtual env and dependencies
