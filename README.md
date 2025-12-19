@@ -38,6 +38,6 @@ Happy development!
 
 ### Tested Projects
 
+- https://github.com/iree-org/fusilli
 - https://github.com/llvm/torch-mlir
 - https://github.com/llvm/mlir-tcp
-- https://github.com/nod-ai/shark-ai/tree/main/sharkfuser
