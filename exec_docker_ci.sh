@@ -12,6 +12,9 @@ source "${SCRIPT_DIR}/init_docker.sh"
 docker run --rm \
            -v "${PWD}":/workspace \
            ${DOCKER_RUN_DEVICE_OPTS} \
+           -e IREE_GIT_TAG=${IREE_GIT_TAG} \
+           -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG} \
+           -e ARCH=${ARCH} \
            --security-opt seccomp=unconfined \
            ghcr.io/sjain-stanford/compiler-dev-ubuntu-24.04:main \
            "$@"
