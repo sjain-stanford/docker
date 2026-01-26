@@ -9,7 +9,6 @@ source "${SCRIPT_DIR}/init_docker.sh"
 # Bind mounts for the following:
 # - current directory to /workspace in the container
 # https://rocm.docs.amd.com/projects/install-on-linux/en/latest/how-to/docker.html#accessing-gpus-in-containers
-
 docker run --rm \
            -v "${PWD}":/workspace \
            ${DOCKER_RUN_DEVICE_OPTS} \
