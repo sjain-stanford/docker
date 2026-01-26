@@ -9,9 +9,23 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 IREE_DIR=${DOCKER_CACHE_DIR}/iree
 
 # Version pins
-IREE_GIT_TAG=3.10.0rc20260114
-THEROCK_GIT_TAG=7.11.0a20260109
-THEROCK_DIST=therock-dist-linux-gfx94X-dcgpu
+IREE_GIT_TAG="${IREE_GIT_TAG:-3.10.0rc20260114}"
+THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-7.11.0a20260109}"
+AMD_ARCH="${AMD_ARCH:-gfx94X}"
+
+case "$AMD_ARCH" in
+  gfx94X | gfx942)
+    THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu"
+    ;;
+  gfx950)
+    THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
+    ;;
+  *)
+    echo "ERROR: Unsupported architecture: $AMD_ARCH" >&2
+    exit 1
+    ;;
+esac
+
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
 # This installation is cached locally at `${PWD}/.cache/docker` so re-runs are

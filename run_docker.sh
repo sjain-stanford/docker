@@ -17,5 +17,8 @@ docker run -it \
            -v "${PWD}":"${PWD}" \
            -v "${HOME}":"${HOME}" \
            ${DOCKER_RUN_DEVICE_OPTS} \
+           -e IREE_GIT_TAG=${IREE_GIT_TAG} \
+           -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG} \
+           -e AMD_ARCH=${AMD_ARCH} \
            --security-opt seccomp=unconfined \
            compiler-dev-ubuntu-24.04:latest
