@@ -16,7 +16,7 @@ docker run --rm \
            ${DOCKER_RUN_DEVICE_OPTS} \
            -e IREE_GIT_TAG=${IREE_GIT_TAG} \
            -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG} \
-           -e ARCH=${ARCH} \
+           -e AMD_ARCH=${AMD_ARCH} \
            -v "$SCRIPT_DIR/entrypoint.sh:/entrypoint.sh" \
            --entrypoint /entrypoint.sh \
            --security-opt seccomp=unconfined \

@@ -11,10 +11,9 @@ IREE_DIR=${DOCKER_CACHE_DIR}/iree
 # Version pins
 IREE_GIT_TAG="${IREE_GIT_TAG:-3.10.0rc20260114}"
 THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-7.11.0a20260109}"
-ARCH="${ARCH:-gfx94X}"
-THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu"
+AMD_ARCH="${AMD_ARCH:-gfx94X}"
 
-case "$ARCH" in
+case "$AMD_ARCH" in
   gfx94X | gfx942)
     THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu"
     ;;
@@ -22,7 +21,7 @@ case "$ARCH" in
     THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
     ;;
   *)
-    echo "ERROR: Unsupported architecture: $ARCH" >&2
+    echo "ERROR: Unsupported architecture: $AMD_ARCH" >&2
     exit 1
     ;;
 esac
