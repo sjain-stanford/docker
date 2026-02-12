@@ -30,6 +30,7 @@ RUN apt-get update && \
     clang-tidy \
     cmake-curses-gui \
     cmake \
+    curl \
     gdb \
     git \
     lcov \
