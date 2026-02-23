@@ -20,6 +20,12 @@ case "$AMD_ARCH" in
   gfx950)
     THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
     ;;
+  gfx110X | gfx1100)
+    THEROCK_DIST="therock-dist-linux-gfx110X-all"
+    ;;
+  gfx120X | gfx1201)
+    THEROCK_DIST="therock-dist-linux-gfx120X-all"
+    ;;
   *)
     echo "ERROR: Unsupported architecture: $AMD_ARCH" >&2
     exit 1
