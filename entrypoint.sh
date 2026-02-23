@@ -20,10 +20,10 @@ case "$AMD_ARCH" in
   gfx950)
     THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
     ;;
-  gfx110x | gfx1100)
+  gfx110X | gfx1100)
     THEROCK_DIST="therock-dist-linux-gfx110X-all"
     ;;
-  gfx120x | gfx1201)
+  gfx120X | gfx1201)
     THEROCK_DIST="therock-dist-linux-gfx120X-all"
     ;;
   *)
