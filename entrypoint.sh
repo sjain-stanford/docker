@@ -35,15 +35,16 @@ esac
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
 # This installation is cached locally at `${PWD}/.cache/docker` so re-runs are
-# instantaneous. However, the cache is NOT automatically invalidated and needs
-# to be cleared manually (like when library versions are bumped). To clear the
-# installation cache, simply remove the `${PWD}/.cache/docker` dir and re-run.
-if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
-    echo "[entrypoint.sh] Cache NOT found at '${DOCKER_CACHE_DIR}', proceeding with installation..."
-    mkdir -p ${DOCKER_CACHE_DIR}
-    # Remove partial/corrupt cache contents that may have been
-    # populated without a `.install_complete`.
+# instantaneous. The cache is automatically invalidated when IREE or TheRock
+# versions change (the cache marker encodes version pins). To force a clean
+# reinstall, remove the `${PWD}/.cache/docker` dir and re-run.
+CACHE_KEY="${IREE_GIT_TAG}-${THEROCK_GIT_TAG}"
+if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
+    echo "[entrypoint.sh] Cache NOT found for '${CACHE_KEY}' at '${DOCKER_CACHE_DIR}', proceeding with installation..."
+    # Remove stale cache (including old .install_complete markers and
+    # partial/corrupt contents from interrupted installs).
     rm -rf ${DOCKER_CACHE_DIR}/*
+    mkdir -p ${DOCKER_CACHE_DIR}
 
     # Install TheRock (ROCm/HIP) for GFX942
     echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution '${THEROCK_DIST}' at tag '${THEROCK_GIT_TAG}'..."
@@ -87,10 +88,10 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete" ]; then
     ln -s ${VENV_DIR}/bin/llvm-symbolizer-22 ${VENV_DIR}/bin/llvm-symbolizer
 
     # Used to validate cache for future runs
-    touch "${DOCKER_CACHE_DIR}/.install_complete"
+    touch "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}"
 
 else
-    echo "[entrypoint.sh] Cache found at '${DOCKER_CACHE_DIR}', skipped installation..."
+    echo "[entrypoint.sh] Cache found for '${CACHE_KEY}' at '${DOCKER_CACHE_DIR}', skipped installation..."
 fi
 
 # Check if stdin is attached to a TTY (true for interactive run, false otherwise).
