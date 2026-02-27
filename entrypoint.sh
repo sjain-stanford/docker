@@ -43,8 +43,8 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     echo "[entrypoint.sh] Cache NOT found for '${CACHE_KEY}' at '${DOCKER_CACHE_DIR}', proceeding with installation..."
     # Remove stale cache (including old .install_complete markers and
     # partial/corrupt contents from interrupted installs).
-    rm -rf ${DOCKER_CACHE_DIR}/*
-    mkdir -p ${DOCKER_CACHE_DIR}
+    rm -rf "${DOCKER_CACHE_DIR}"
+    mkdir -p "${DOCKER_CACHE_DIR}"
 
     # Install TheRock (ROCm/HIP) for GFX942
     echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution '${THEROCK_DIST}' at tag '${THEROCK_GIT_TAG}'..."
