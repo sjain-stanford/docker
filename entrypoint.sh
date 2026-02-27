@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 # Install dirs
 # CAUTION: These directories need to be kept in sync with the `activate` script!!

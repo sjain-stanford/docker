@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -12,9 +13,9 @@ source "${SCRIPT_DIR}/init_docker.sh"
 docker run --rm \
            -v "${PWD}":/workspace \
            ${DOCKER_RUN_DEVICE_OPTS} \
-           -e IREE_GIT_TAG=${IREE_GIT_TAG} \
-           -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG} \
-           -e AMD_ARCH=${AMD_ARCH} \
+           -e IREE_GIT_TAG=${IREE_GIT_TAG:-} \
+           -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG:-} \
+           -e AMD_ARCH=${AMD_ARCH:-} \
            --security-opt seccomp=unconfined \
            ghcr.io/sjain-stanford/compiler-dev-ubuntu-24.04:main \
            "$@"

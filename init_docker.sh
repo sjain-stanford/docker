@@ -7,6 +7,7 @@
 # adding user to the GIDs of named groups (obtained from `getent group render` or
 # `getent group video`), we simply check the owning GID of the device nodes on the host
 # and pass it to `docker run` with `--group-add=<GID>`.
+DOCKER_RUN_DEVICE_OPTS=""
 for DEV in /dev/kfd /dev/dri/*; do
   # Skip if not a character device
   # /dev/dri/by-path/ symlinks are ignored
