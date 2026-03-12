@@ -31,8 +31,8 @@ For example:
 /path/to/docker/exec_docker.sh bash -c "echo "Hello" && echo "World""
 ```
 
-> [!WARNING]
-> To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm/IREE) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. However, the cache is NOT automatically invalidated and needs to be cleared manually (like when library versions are bumped). To clear the installation cache, simply remove the `${PWD}/.cache/docker` directory and re-run.
+> [!NOTE]
+> To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm/IREE) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. The cache is automatically invalidated when IREE or TheRock versions change. To force a clean reinstall, remove the `${PWD}/.cache/docker` directory and re-run.
 
 Happy development!
 
