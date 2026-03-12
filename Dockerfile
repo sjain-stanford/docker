@@ -62,6 +62,9 @@ ARG BAZEL_VERSION=6.4.0
 RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${ARCH} -O /usr/bin/bazel && \
     chmod a+x /usr/bin/bazel
 
+# Install beads_rust (br) - agent-first issue tracker
+RUN curl -fsSL "https://raw.githubusercontent.com/Dicklesworthstone/beads_rust/main/install.sh" | bash -s -- --system
+
 # Set workdir before launching container
 WORKDIR ${WORKDIR}
 
