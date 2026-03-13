@@ -83,9 +83,12 @@ RUN if [ "$UID" != "0" ]; then \
     groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
-    echo "${USER} ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/${USER} && \
+    echo "${USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /usr/bin/apt, /usr/bin/dpkg, /usr/bin/tee, /usr/bin/chown, /usr/bin/chmod" > /etc/sudoers.d/${USER} && \
     chown -R ${USER}:${GROUP} ${WORKDIR}; \
     fi
+
+# Strip setuid/setgid bits — none are needed inside a dev container
+RUN find / -xdev -perm /6000 -type f -exec chmod a-s {} + 2>/dev/null || true
 
 # Switch to user
 USER ${USER}
