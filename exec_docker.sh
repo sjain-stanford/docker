@@ -17,5 +17,6 @@ docker run --rm \
            -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG:-} \
            -e AMD_ARCH=${AMD_ARCH:-} \
            --cap-drop=NET_RAW \
+           --ulimit nofile=4096:4096 \
            compiler-dev-ubuntu-24.04:latest \
            "$@"
