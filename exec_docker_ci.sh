@@ -14,5 +14,6 @@ docker run --rm \
            -e IREE_GIT_TAG=${IREE_GIT_TAG:-} \
            -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG:-} \
            -e AMD_ARCH=${AMD_ARCH:-} \
+           --cap-drop=NET_RAW \
            ghcr.io/sjain-stanford/compiler-dev-ubuntu-24.04:main \
            "$@"
