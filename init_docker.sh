@@ -1,5 +1,25 @@
 #!/usr/bin/env bash
 
+# Bind mounts: only mount what the dev workflow actually needs.
+# Sensitive paths (.bash_history, .docker) are intentionally excluded.
+# Read-write mounts
+DOCKER_RUN_MOUNT_OPTS=""
+DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
+[ -e "${HOME}/.claude" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude:${HOME}/.claude"
+[ -e "${HOME}/.claude.json" ]        && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude.json:${HOME}/.claude.json"
+[ -e "${HOME}/.local/state/claude" ] && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local/state/claude:${HOME}/.local/state/claude"
+[ -e "${HOME}/.cache" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cache:${HOME}/.cache"
+[ -e "${HOME}/.cursor-server" ]      && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor-server:${HOME}/.cursor-server"
+# Read-only mounts
+[ -e "${HOME}/.ssh" ]                && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.ssh:${HOME}/.ssh:ro"
+[ -e "${HOME}/.gitconfig" ]          && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gitconfig:${HOME}/.gitconfig:ro"
+[ -e "${HOME}/.config" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.config:${HOME}/.config:ro"
+[ -e "${HOME}/.gnupg" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gnupg:${HOME}/.gnupg:ro"
+[ -e "${HOME}/.local" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local:${HOME}/.local:ro"
+[ -e "${HOME}/.bashrc" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc:ro"
+[ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
+[ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
+
 # ROCm requires accesses to the host’s /dev/kfd and /dev/dri/* device nodes, typically
 # owned by the `render` and `video` groups. The groups’ GIDs in the container must
 # match the host’s to access the resources. Sometimes the device nodes may be owned by
@@ -16,4 +36,5 @@ for DEV in /dev/kfd /dev/dri/*; do
 done
 
 # Export for use by `run_docker.sh` and `exec_docker.sh`
+export DOCKER_RUN_MOUNT_OPTS
 export DOCKER_RUN_DEVICE_OPTS
