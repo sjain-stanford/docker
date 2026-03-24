@@ -71,7 +71,6 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
             third_party/hip-build-deps \
             third_party/benchmark \
             third_party/flatcc \
-            third_party/printf
     )
 
     # Install python virtual env and dependencies
