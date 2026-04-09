@@ -81,7 +81,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
         --find-links https://iree.dev/pip-release-links.html \
         iree-base-compiler==${IREE_GIT_TAG}
 
-    # Make FileCheck (from system llvm-18) and clang-22, llvm-symbolizer (from TheRock) accessible in VENV
+    # Make FileCheck (from system llvm-18) and clang-23, llvm-symbolizer (from TheRock) accessible in VENV
     ln -s /usr/lib/llvm-18/bin/FileCheck ${VENV_DIR}/bin/FileCheck
     # TODO(sjain-stanford): clang-tidy from TheRock segfaults. Use system clang-tidy instead.
     # ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-tidy ${VENV_DIR}/bin/clang-tidy
