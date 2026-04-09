@@ -9,6 +9,7 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.claude.json" ]        && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude.json:${HOME}/.claude.json"
 [ -e "${HOME}/.local/state/claude" ] && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local/state/claude:${HOME}/.local/state/claude"
 [ -e "${HOME}/.cache" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cache:${HOME}/.cache"
+[ -e "${HOME}/.cursor" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor:${HOME}/.cursor"
 [ -e "${HOME}/.cursor-server" ]      && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor-server:${HOME}/.cursor-server"
 # Read-only mounts
 [ -e "${HOME}/.ssh" ]                && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.ssh:${HOME}/.ssh:ro"
