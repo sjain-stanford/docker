@@ -84,7 +84,7 @@ RUN if [ "$UID" != "0" ]; then \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
     echo "${USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /usr/bin/apt, /usr/bin/dpkg, /usr/bin/tee, /usr/bin/chown, /usr/bin/chmod" > /etc/sudoers.d/${USER} && \
-    chown -R ${USER}:${GROUP} ${WORKDIR}; \
+    chown -R ${USER}:${GROUP} /home/${USER} ${WORKDIR}; \
     fi
 
 # Strip setuid/setgid bits — none are needed inside a dev container
