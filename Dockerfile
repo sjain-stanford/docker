@@ -79,12 +79,17 @@ CMD ["/bin/bash"]
 # Mirror user and group within container and set ownerships
 # only if building as non-root user (i.e., GROUP, GID, USER,
 # UID and WORKDIR are specified args to docker build)
+#
+# NOTE: When WORKDIR lies under /home/${USER} the WORKDIR instruction above
+# already created the home as root -- useradd -m skips chown on a pre-existing
+# home. We chown /home/${USER} as well as ${WORKDIR} to ensure that the user
+# owns /home/${USER}.
 RUN if [ "$UID" != "0" ]; then \
     groupadd -o -g ${GID} ${GROUP} && \
     useradd -u ${UID} -g ${GROUP} -ms /bin/bash ${USER} && \
     usermod -aG sudo ${USER} && \
     echo "${USER} ALL=(ALL) NOPASSWD: /usr/bin/apt-get, /usr/bin/apt, /usr/bin/dpkg, /usr/bin/tee, /usr/bin/chown, /usr/bin/chmod" > /etc/sudoers.d/${USER} && \
-    chown -R ${USER}:${GROUP} ${WORKDIR}; \
+    chown -R ${USER}:${GROUP} ${WORKDIR} /home/${USER}; \
     fi
 
 # Strip setuid/setgid bits — none are needed inside a dev container

@@ -11,13 +11,15 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.cache" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cache:${HOME}/.cache"
 [ -e "${HOME}/.cursor" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor:${HOME}/.cursor"
 [ -e "${HOME}/.cursor-server" ]      && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor-server:${HOME}/.cursor-server"
+# .bashrc is mounted read-write so `entrypoint.sh` can append its
+# VENV-activation stanza (see entrypoint.sh).
+[ -e "${HOME}/.bashrc" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc"
 # Read-only mounts
 [ -e "${HOME}/.ssh" ]                && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.ssh:${HOME}/.ssh:ro"
 [ -e "${HOME}/.gitconfig" ]          && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gitconfig:${HOME}/.gitconfig:ro"
 [ -e "${HOME}/.config" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.config:${HOME}/.config:ro"
 [ -e "${HOME}/.gnupg" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gnupg:${HOME}/.gnupg:ro"
 [ -e "${HOME}/.local" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local:${HOME}/.local:ro"
-[ -e "${HOME}/.bashrc" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc:ro"
 [ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
 [ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
 
