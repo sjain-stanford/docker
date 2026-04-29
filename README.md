@@ -16,6 +16,33 @@ This launches an interactive shell within the container. All code in the current
 
 To use VSCode's integrated debugger with the container, we recommend using the "Dev Containers" extension. Simply `run_docker.sh` to launch the container, then press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the command palette and select "Dev Containers: Attach to Running Container...". See [this](https://code.visualstudio.com/docs/devcontainers/attach-container) for details.
 
+### Bubblewrap sandbox support
+
+The image installs `bubblewrap` and keeps `/usr/bin/bwrap` in setuid mode so
+non-root users inside the container can create nested user/mount namespaces.
+The local launcher scripts (`run_docker.sh` and `exec_docker.sh`) also pass the
+Docker runtime options needed for Codex's Linux sandbox:
+
+```
+--cap-add=SYS_ADMIN
+--cap-add=SYS_CHROOT
+--cap-add=NET_ADMIN
+--cap-add=NET_RAW
+--cap-add=SETUID
+--cap-add=SETGID
+--cap-add=SYS_PTRACE
+--security-opt=seccomp=unconfined
+--security-opt=apparmor=unconfined
+```
+
+These options follow the [secure OpenAI Codex devcontainer profile](https://github.com/openai/codex/tree/main/.devcontainer)'s
+bwrap sandbox requirements. They are enabled by default for local launchers and
+can be disabled with:
+
+```
+DOCKER_ENABLE_BWRAP_SANDBOX=0 /path/to/docker/run_docker.sh
+```
+
 
 ### Non-interactive usage (CI)
 

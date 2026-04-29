@@ -13,10 +13,10 @@ source "${SCRIPT_DIR}/init_docker.sh"
 docker run --rm \
            ${DOCKER_RUN_MOUNT_OPTS} \
            ${DOCKER_RUN_DEVICE_OPTS} \
+           ${DOCKER_RUN_BWRAP_OPTS} \
            -e IREE_GIT_TAG=${IREE_GIT_TAG:-} \
            -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG:-} \
            -e AMD_ARCH=${AMD_ARCH:-} \
-           --cap-drop=NET_RAW \
            --ulimit nofile=4096:4096 \
            compiler-dev-ubuntu-24.04:latest \
            "$@"
