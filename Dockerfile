@@ -110,8 +110,10 @@ RUN if [ "$UID" != "0" ]; then \
     chown -R ${USER}:${GROUP} ${WORKDIR} /home/${USER}; \
     fi
 
-# Strip setuid/setgid bits — none are needed inside a dev container
-RUN find / -xdev -perm /6000 -type f -exec chmod a-s {} + 2>/dev/null || true
+# Strip setuid/setgid bits, then restore bubblewrap's setuid helper so
+# non-root users can create Codex's inner Linux sandbox inside Docker.
+RUN find / -xdev -perm /6000 -type f -exec chmod a-s {} + 2>/dev/null || true && \
+    chmod u+s /usr/bin/bwrap
 
 # Switch to user
 USER ${USER}

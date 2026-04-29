@@ -39,6 +39,28 @@ for DEV in /dev/kfd /dev/dri/*; do
   DOCKER_RUN_DEVICE_OPTS+=" --device=${DEV} --group-add=$(stat -c '%g' ${DEV})"
 done
 
-# Export for use by `run_docker.sh` and `exec_docker.sh`
+# Bubblewrap/Codex sandbox support:
+# - bwrap runs as a setuid helper in the image for non-root container users.
+# - Docker's default seccomp/AppArmor profiles can block namespace setup before
+#   bwrap/Codex install their inner sandbox, so relax them explicitly here.
+# - Mirrors https://github.com/openai/codex/blob/24be9ac0a4695274ac7921ecb692a9ffb3205fd2/.devcontainer/devcontainer.secure.json#L14
+# Set DOCKER_ENABLE_BWRAP_SANDBOX=0 to launch without these runtime options.
+DOCKER_RUN_BWRAP_OPTS="${DOCKER_RUN_BWRAP_OPTS:-}"
+DOCKER_ENABLE_BWRAP_SANDBOX="${DOCKER_ENABLE_BWRAP_SANDBOX:-1}"
+if [ "${DOCKER_ENABLE_BWRAP_SANDBOX}" = "1" ]; then
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=SYS_ADMIN"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=SYS_CHROOT"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=NET_ADMIN"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=NET_RAW"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=SETUID"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=SETGID"
+  DOCKER_RUN_BWRAP_OPTS+=" --cap-add=SYS_PTRACE"
+  DOCKER_RUN_BWRAP_OPTS+=" --security-opt=seccomp=unconfined"
+  DOCKER_RUN_BWRAP_OPTS+=" --security-opt=apparmor=unconfined"
+fi
+
+# Export for use by `run_docker.sh`, `exec_docker.sh`, and `exec_docker_ci.sh`.
+# `exec_docker_ci.sh` intentionally uses only device options from this file.
 export DOCKER_RUN_MOUNT_OPTS
 export DOCKER_RUN_DEVICE_OPTS
+export DOCKER_RUN_BWRAP_OPTS
