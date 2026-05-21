@@ -35,6 +35,7 @@ RUN apt-get update && \
     curl \
     gdb \
     git \
+    git-lfs \
     gnupg \
     lcov \
     lld \
@@ -45,6 +46,7 @@ RUN apt-get update && \
     ripgrep \
     vim \
     wget && \
+    git lfs install --system && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
