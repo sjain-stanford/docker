@@ -82,6 +82,20 @@ ARG BAZEL_VERSION=6.4.0
 RUN wget -q https://github.com/bazelbuild/bazel/releases/download/${BAZEL_VERSION}/bazel-${BAZEL_VERSION}-linux-${ARCH} -O /usr/bin/bazel && \
     chmod a+x /usr/bin/bazel
 
+# Install Rust through rustup
+ARG RUST_TOOLCHAIN=1.95.0
+ENV RUSTUP_HOME=/opt/rustup
+ENV CARGO_HOME=/opt/cargo
+ENV PATH=/opt/cargo/bin:${PATH}
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs -o /tmp/rustup-init.sh && \
+    sh /tmp/rustup-init.sh -y --no-modify-path \
+      --profile minimal \
+      --default-toolchain ${RUST_TOOLCHAIN} \
+      --component rustfmt \
+      --component clippy && \
+    rm -f /tmp/rustup-init.sh && \
+    chmod -R a+rwX /opt/rustup /opt/cargo
+
 # Install beads_rust (br) - agent-first issue tracker
 RUN curl -fsSL "https://raw.githubusercontent.com/Dicklesworthstone/beads_rust/main/install.sh" | bash -s -- --system
 
