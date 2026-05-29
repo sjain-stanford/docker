@@ -11,7 +11,6 @@ source "${SCRIPT_DIR}/init_docker.sh"
 docker run --rm \
            -v "${PWD}":/workspace \
            ${DOCKER_RUN_DEVICE_OPTS} \
-           -e IREE_GIT_TAG=${IREE_GIT_TAG:-} \
            -e THEROCK_GIT_TAG=${THEROCK_GIT_TAG:-} \
            -e AMD_ARCH=${AMD_ARCH:-} \
            --cap-drop=NET_RAW \

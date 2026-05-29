@@ -94,7 +94,7 @@ For example:
 ```
 
 > [!NOTE]
-> To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm/IREE) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. The cache is automatically invalidated when IREE or TheRock versions change. To force a clean reinstall, remove the `${PWD}/.cache/docker` directory and re-run.
+> To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. The cache is automatically invalidated when the TheRock version or selected distribution changes. To force a clean reinstall, remove the `${PWD}/.cache/docker` directory and re-run.
 
 Happy development!
 

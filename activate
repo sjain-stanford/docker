@@ -69,9 +69,7 @@ PATH="${VIRTUAL_ENV}/bin:${THEROCK_DIR}/bin:${PATH}"
 export PATH
 
 # save old LD_LIBRARY_PATH and re-export
-# Order loads so TheRock's IREE compiler libs do not shadow the bundled IREE libs from python wheel.
-_VENV_SITE_PACKAGES="$("${VIRTUAL_ENV}/bin/python3" -c 'import sysconfig; print(sysconfig.get_path("platlib"))')"
-_VENV_LD_LIBRARY_PATH="${_VENV_SITE_PACKAGES}/iree/compiler/_mlir_libs:${THEROCK_DIR}/lib"
+_VENV_LD_LIBRARY_PATH="${THEROCK_DIR}/lib"
 if [ -n "${LD_LIBRARY_PATH:-}" ] ; then
     _OLD_VIRTUAL_LD_LIBRARY_PATH="${LD_LIBRARY_PATH:-}"
     LD_LIBRARY_PATH="${_VENV_LD_LIBRARY_PATH}:${LD_LIBRARY_PATH:-}"
@@ -79,7 +77,6 @@ else
     LD_LIBRARY_PATH="${_VENV_LD_LIBRARY_PATH}"
 fi
 export LD_LIBRARY_PATH
-unset _VENV_SITE_PACKAGES
 unset _VENV_LD_LIBRARY_PATH
 
 # unset PYTHONHOME if set
