@@ -11,17 +11,17 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-7.14.0a20260529}"
 AMD_ARCH="${AMD_ARCH:-gfx94X}"
 
-case "$AMD_ARCH" in
-  gfx94X | gfx942)
+case "${AMD_ARCH,,}" in
+  gfx94x | gfx942)
     THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu"
     ;;
   gfx950)
     THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
     ;;
-  gfx110X | gfx1100)
+  gfx110x | gfx1100 | gfx1101 | gfx1102 | gfx1103)
     THEROCK_DIST="therock-dist-linux-gfx110X-all"
     ;;
-  gfx120X | gfx1201)
+  gfx120x | gfx1200 | gfx1201)
     THEROCK_DIST="therock-dist-linux-gfx120X-all"
     ;;
   *)
@@ -44,7 +44,7 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     rm -rf "${DOCKER_CACHE_DIR}"
     mkdir -p "${DOCKER_CACHE_DIR}"
 
-    # Install TheRock (ROCm/HIP) for GFX942
+    # Install TheRock (ROCm/HIP) for the selected GPU family.
     echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution '${THEROCK_DIST}' at tag '${THEROCK_GIT_TAG}'..."
     mkdir -p ${THEROCK_DIR}
     THEROCK_CDN_URL="https://rocm.nightlies.amd.com/tarball/${THEROCK_TAR}"

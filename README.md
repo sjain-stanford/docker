@@ -16,6 +16,20 @@ This launches an interactive shell within the container. All code in the current
 
 To use VSCode's integrated debugger with the container, we recommend using the "Dev Containers" extension. Simply `run_docker.sh` to launch the container, then press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the command palette and select "Dev Containers: Attach to Running Container...". See [this](https://code.visualstudio.com/docs/devcontainers/attach-container) for details.
 
+### Non-interactive usage (CI)
+
+To execute commands within the container in batch mode (non-interactive):
+```
+/path/to/docker/exec_docker.sh <command>
+```
+
+For example:
+```
+/path/to/docker/exec_docker.sh echo "Hello World"
+
+/path/to/docker/exec_docker.sh bash -c "echo "Hello" && echo "World""
+```
+
 ### Bubblewrap sandbox support
 
 The image installs `bubblewrap` and keeps `/usr/bin/bwrap` in setuid mode so
@@ -79,19 +93,21 @@ docker run --rm -it -v "$PWD:$PWD" -w "$PWD" ubuntu:24.04 bash
 Mounting the host Docker socket grants broad control over the host daemon, so only
 use this with trusted dev containers and workloads.
 
-### Non-interactive usage (CI)
+### GPU architecture selection
 
-To execute commands within the container in batch mode (non-interactive):
+The launch scripts pass `AMD_ARCH` into the container so `entrypoint.sh` can
+download the matching TheRock distribution. If `AMD_ARCH` is unset, the scripts
+try to detect the first host GPU reported by `rocminfo`.
+
+Override detection when needed:
+
 ```
-/path/to/docker/exec_docker.sh <command>
+AMD_ARCH=gfx950 /path/to/docker/run_docker.sh
 ```
 
-For example:
-```
-/path/to/docker/exec_docker.sh echo "Hello World"
-
-/path/to/docker/exec_docker.sh bash -c "echo "Hello" && echo "World""
-```
+Supported values are `gfx94X`/`gfx942`, `gfx950`, `gfx110X`/`gfx1100`-`gfx1103`,
+and `gfx120X`/`gfx1200`/`gfx1201`. If no ROCm GPU is detected and
+`AMD_ARCH` is not set, the container falls back to `gfx94X`.
 
 > [!NOTE]
 > To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. The cache is automatically invalidated when the TheRock version or selected distribution changes. To force a clean reinstall, remove the `${PWD}/.cache/docker` directory and re-run.
