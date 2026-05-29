@@ -103,7 +103,7 @@ RUN curl -fsSL "https://raw.githubusercontent.com/Dicklesworthstone/beads_rust/m
 # Set workdir before launching container
 WORKDIR ${WORKDIR}
 
-# Install IREE, ROCm, HIP deps through an entrypoint script
+# Install ROCm/HIP deps through an entrypoint script
 # to keep the base image small and portable.
 COPY entrypoint.sh /usr/local/bin/entrypoint.sh
 COPY activate /usr/local/bin/activate

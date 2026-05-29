@@ -6,10 +6,8 @@ set -euo pipefail
 DOCKER_CACHE_DIR=${PWD}/.cache/docker
 VENV_DIR=${DOCKER_CACHE_DIR}/venv
 THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
-IREE_DIR=${DOCKER_CACHE_DIR}/iree
 
 # Version pins
-IREE_GIT_TAG="${IREE_GIT_TAG:-3.12.0rc20260520}"
 THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-7.14.0a20260520}"
 AMD_ARCH="${AMD_ARCH:-gfx94X}"
 
@@ -35,10 +33,10 @@ esac
 THEROCK_TAR=${THEROCK_DIST}-${THEROCK_GIT_TAG}.tar.gz
 
 # This installation is cached locally at `${PWD}/.cache/docker` so re-runs are
-# instantaneous. The cache is automatically invalidated when IREE or TheRock
-# versions change (the cache marker encodes version pins). To force a clean
-# reinstall, remove the `${PWD}/.cache/docker` dir and re-run.
-CACHE_KEY="${IREE_GIT_TAG}-${THEROCK_GIT_TAG}"
+# instantaneous. The cache is automatically invalidated when TheRock version or
+# distribution changes. To force a clean reinstall, remove the
+# `${PWD}/.cache/docker` dir and re-run.
+CACHE_KEY="${THEROCK_GIT_TAG}-${THEROCK_DIST}"
 if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     echo "[entrypoint.sh] Cache NOT found for '${CACHE_KEY}' at '${DOCKER_CACHE_DIR}', proceeding with installation..."
     # Remove stale cache (including old .install_complete markers and
@@ -61,24 +59,10 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
 
-    # Clone IREE source
-    echo "[entrypoint.sh] Fetching IREE from source at tag '${IREE_GIT_TAG}'..."
-    git clone --depth=1 --branch iree-${IREE_GIT_TAG} https://github.com/iree-org/iree.git ${IREE_DIR}
-    # Run this in a subshell to preserve $(pwd) for main shell
-    (
-        cd ${IREE_DIR}
-        git submodule update --init \
-            third_party/hip-build-deps \
-            third_party/flatcc \
-    )
-
     # Install python virtual env and dependencies
     echo "[entrypoint.sh] Setting up python venv and installing pip deps..."
     python3 -m venv ${VENV_DIR}
-    ${VENV_DIR}/bin/pip install \
-        lit \
-        --find-links https://iree.dev/pip-release-links.html \
-        iree-base-compiler==${IREE_GIT_TAG}
+    ${VENV_DIR}/bin/pip install lit
 
     # Make FileCheck (from system llvm-18) and clang-23, llvm-symbolizer (from TheRock) accessible in VENV
     ln -s /usr/lib/llvm-18/bin/FileCheck ${VENV_DIR}/bin/FileCheck
