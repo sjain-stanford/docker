@@ -33,6 +33,7 @@ RUN apt-get update && \
     cmake-curses-gui \
     cmake \
     curl \
+    docker.io \
     gdb \
     git \
     git-lfs \

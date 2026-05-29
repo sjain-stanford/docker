@@ -4,6 +4,7 @@
 # Sensitive paths (.bash_history, .docker) are intentionally excluded.
 # Read-write mounts
 DOCKER_RUN_MOUNT_OPTS="${DOCKER_RUN_MOUNT_OPTS:-}"
+DOCKER_RUN_ENV_OPTS="${DOCKER_RUN_ENV_OPTS:-}"
 DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.claude" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude:${HOME}/.claude"
 [ -e "${HOME}/.claude.json" ]        && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude.json:${HOME}/.claude.json"
@@ -23,6 +24,44 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.local" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local:${HOME}/.local:ro"
 [ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
 [ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
+
+# Host Docker API compatibility.
+# Export the host daemon API version before running host-side docker commands
+# from run_docker.sh and exec_docker.sh, even when socket forwarding is disabled.
+detect_host_docker_api_version() {
+  local api_version
+  api_version="$(docker version --format '{{.Server.APIVersion}}' 2>/dev/null || true)"
+  if [ -n "${api_version}" ]; then
+    printf "%s\n" "${api_version}"
+    return
+  fi
+
+  docker version 2>&1 \
+    | sed -n 's/.*Maximum supported API version is \([0-9][0-9.]*\).*/\1/p' \
+    | tail -n 1 || true
+}
+
+HOST_DOCKER_API_VERSION="${DOCKER_API_VERSION:-}"
+if [ -z "${HOST_DOCKER_API_VERSION}" ]; then
+  HOST_DOCKER_API_VERSION="$(detect_host_docker_api_version)"
+fi
+if [ -n "${HOST_DOCKER_API_VERSION}" ]; then
+  export DOCKER_API_VERSION="${HOST_DOCKER_API_VERSION}"
+fi
+
+# Host Docker socket forwarding.
+# This uses the host Docker daemon from inside the dev container, so containers
+# launched from the dev container are host-level sibling containers.
+# Set DOCKER_ENABLE_HOST_DOCKER=1 to launch with host Docker access.
+DOCKER_ENABLE_HOST_DOCKER="${DOCKER_ENABLE_HOST_DOCKER:-0}"
+if [ "${DOCKER_ENABLE_HOST_DOCKER}" = "1" ] && [ -S /var/run/docker.sock ]; then
+  DOCKER_RUN_MOUNT_OPTS+=" -v /var/run/docker.sock:/var/run/docker.sock"
+  DOCKER_RUN_MOUNT_OPTS+=" --group-add=$(stat -c '%g' /var/run/docker.sock)"
+
+  if [ -n "${HOST_DOCKER_API_VERSION}" ]; then
+    DOCKER_RUN_ENV_OPTS+=" -e DOCKER_API_VERSION=${HOST_DOCKER_API_VERSION}"
+  fi
+fi
 
 # ROCm requires accesses to the host’s /dev/kfd and /dev/dri/* device nodes, typically
 # owned by the `render` and `video` groups. The groups’ GIDs in the container must
@@ -62,5 +101,6 @@ fi
 # Export for use by `run_docker.sh`, `exec_docker.sh`, and `exec_docker_ci.sh`.
 # `exec_docker_ci.sh` intentionally uses only device options from this file.
 export DOCKER_RUN_MOUNT_OPTS
+export DOCKER_RUN_ENV_OPTS
 export DOCKER_RUN_DEVICE_OPTS
 export DOCKER_RUN_BWRAP_OPTS
