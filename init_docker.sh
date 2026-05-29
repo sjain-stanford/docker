@@ -63,6 +63,38 @@ if [ "${DOCKER_ENABLE_HOST_DOCKER}" = "1" ] && [ -S /var/run/docker.sock ]; then
   fi
 fi
 
+# AMD GPU architecture selection.
+# If the user does not set AMD_ARCH explicitly, detect the first host GPU
+# reported by ROCm and map it to the matching TheRock distribution family.
+detect_host_amd_arch() {
+  local arch
+  arch=""
+
+  if command -v rocminfo >/dev/null 2>&1; then
+    arch="$(awk '/^[[:space:]]*Name:[[:space:]]*gfx/ { print $2; exit }' < <(rocminfo 2>/dev/null) || true)"
+  fi
+
+  case "${arch}" in
+    gfx94[0-9])
+      printf "%s\n" "gfx94X"
+      ;;
+    gfx950)
+      printf "%s\n" "gfx950"
+      ;;
+    gfx110[0-9])
+      printf "%s\n" "gfx110X"
+      ;;
+    gfx120[0-9])
+      printf "%s\n" "gfx120X"
+      ;;
+  esac
+}
+
+if [ -z "${AMD_ARCH:-}" ]; then
+  AMD_ARCH="$(detect_host_amd_arch)"
+fi
+export AMD_ARCH
+
 # ROCm requires accesses to the host’s /dev/kfd and /dev/dri/* device nodes, typically
 # owned by the `render` and `video` groups. The groups’ GIDs in the container must
 # match the host’s to access the resources. Sometimes the device nodes may be owned by
