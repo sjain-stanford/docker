@@ -25,15 +25,14 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
 [ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
 
-# Host Docker socket forwarding.
-# This uses the host Docker daemon from inside the dev container, so containers
-# launched from the dev container are host-level sibling containers.
-# Set DOCKER_ENABLE_HOST_DOCKER=0 to launch without host Docker access.
+# Host Docker API compatibility.
+# Export the host daemon API version before running host-side docker commands
+# from run_docker.sh and exec_docker.sh, even when socket forwarding is disabled.
 detect_host_docker_api_version() {
   local api_version
   api_version="$(docker version --format '{{.Server.APIVersion}}' 2>/dev/null || true)"
   if [ -n "${api_version}" ]; then
-    printf '%s\n' "${api_version}"
+    printf "%s\n" "${api_version}"
     return
   fi
 
@@ -42,17 +41,24 @@ detect_host_docker_api_version() {
     | tail -n 1 || true
 }
 
-DOCKER_ENABLE_HOST_DOCKER="${DOCKER_ENABLE_HOST_DOCKER:-1}"
+HOST_DOCKER_API_VERSION="${DOCKER_API_VERSION:-}"
+if [ -z "${HOST_DOCKER_API_VERSION}" ]; then
+  HOST_DOCKER_API_VERSION="$(detect_host_docker_api_version)"
+fi
+if [ -n "${HOST_DOCKER_API_VERSION}" ]; then
+  export DOCKER_API_VERSION="${HOST_DOCKER_API_VERSION}"
+fi
+
+# Host Docker socket forwarding.
+# This uses the host Docker daemon from inside the dev container, so containers
+# launched from the dev container are host-level sibling containers.
+# Set DOCKER_ENABLE_HOST_DOCKER=1 to launch with host Docker access.
+DOCKER_ENABLE_HOST_DOCKER="${DOCKER_ENABLE_HOST_DOCKER:-0}"
 if [ "${DOCKER_ENABLE_HOST_DOCKER}" = "1" ] && [ -S /var/run/docker.sock ]; then
   DOCKER_RUN_MOUNT_OPTS+=" -v /var/run/docker.sock:/var/run/docker.sock"
   DOCKER_RUN_MOUNT_OPTS+=" --group-add=$(stat -c '%g' /var/run/docker.sock)"
 
-  HOST_DOCKER_API_VERSION="${DOCKER_API_VERSION:-}"
-  if [ -z "${HOST_DOCKER_API_VERSION}" ]; then
-    HOST_DOCKER_API_VERSION="$(detect_host_docker_api_version)"
-  fi
   if [ -n "${HOST_DOCKER_API_VERSION}" ]; then
-    export DOCKER_API_VERSION="${HOST_DOCKER_API_VERSION}"
     DOCKER_RUN_ENV_OPTS+=" -e DOCKER_API_VERSION=${HOST_DOCKER_API_VERSION}"
   fi
 fi

@@ -45,23 +45,27 @@ DOCKER_ENABLE_BWRAP_SANDBOX=0 /path/to/docker/run_docker.sh
 
 ### Host Docker access
 
-The image includes the Docker CLI. When the host has `/var/run/docker.sock`,
-`run_docker.sh` and `exec_docker.sh` mount that socket into the dev container and
+The image includes the Docker CLI. Host Docker access is disabled by default
+because mounting `/var/run/docker.sock` grants broad control over the host
+daemon. When explicitly enabled on hosts that have `/var/run/docker.sock`,
+`run_docker.sh` and `exec_docker.sh` mount that socket into the dev container,
 add the socket-owning group ID so the non-root container user can talk to the
-host Docker daemon. They also set `DOCKER_API_VERSION` to the host daemon's
-supported API version so the container's Docker CLI can talk to older host
-daemons. Containers launched from inside the dev container are host-level sibling
-containers, not nested containers inside the dev container.
+host Docker daemon, and pass `DOCKER_API_VERSION` so the container Docker CLI
+can talk to older host daemons. Containers launched from inside the dev container
+are host-level sibling containers, not nested containers inside the dev
+container.
+
+Enable host Docker access with:
+
+```
+DOCKER_ENABLE_HOST_DOCKER=1 /path/to/docker/run_docker.sh
+```
+
+Once inside the dev container:
 
 ```
 docker ps
 docker run --rm hello-world
-```
-
-Disable host Docker access with:
-
-```
-DOCKER_ENABLE_HOST_DOCKER=0 /path/to/docker/run_docker.sh
 ```
 
 Bind mounts passed to inner `docker run` commands are resolved by the host Docker
