@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       REGISTRY: ghcr.io
-      IMAGE_NAME: sjain-stanford/compiler-dev-ubuntu-24.04
+      IMAGE_NAME: sjain-stanford/compiler-dev-ubuntu-26.04
       FILE_NAME: Dockerfile
     # Sets the permissions granted to the `GITHUB_TOKEN` for the actions in this job.
     permissions:

@@ -15,5 +15,5 @@ docker run --rm \
            -e AMD_ARCH=${AMD_ARCH:-} \
            --cap-drop=NET_RAW \
            --ulimit nofile=4096:4096 \
-           ghcr.io/sjain-stanford/compiler-dev-ubuntu-24.04:main \
+           ghcr.io/sjain-stanford/compiler-dev-ubuntu-26.04:main \
            "$@"
