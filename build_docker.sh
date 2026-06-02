@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 docker build -f ${SCRIPT_DIR}/Dockerfile \
-             -t compiler-dev-ubuntu-24.04:latest \
+             -t compiler-dev-ubuntu-26.04:latest \
              --build-arg GROUP=$(id -gn) \
              --build-arg GID=$(id -g) \
              --build-arg USER=$(id -un) \

@@ -1,7 +1,8 @@
-ARG BASE_IMG=ubuntu:24.04
+ARG BASE_IMG=ubuntu:26.04
 FROM ${BASE_IMG} AS dev-base
 
-# https://askubuntu.com/questions/1513927/ubuntu-24-04-docker-images-now-includes-user-ubuntu-with-uid-gid-1000
+# Newer Ubuntu Docker images include an "ubuntu" user with UID/GID 1000.
+# Remove it so the container can mirror the host user without conflicts.
 RUN userdel -r ubuntu || true
 
 # Specify user IDs and recreate env in container

@@ -87,7 +87,7 @@ daemon. Prefer mounting paths that already exist at the same absolute path on th
 host and in the dev container, for example:
 
 ```
-docker run --rm -it -v "$PWD:$PWD" -w "$PWD" ubuntu:24.04 bash
+docker run --rm -it -v "$PWD:$PWD" -w "$PWD" ubuntu:26.04 bash
 ```
 
 Mounting the host Docker socket grants broad control over the host daemon, so only

@@ -64,8 +64,8 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     python3 -m venv ${VENV_DIR}
     ${VENV_DIR}/bin/pip install lit
 
-    # Make FileCheck (from system llvm-18) and clang-23, llvm-symbolizer (from TheRock) accessible in VENV
-    ln -s /usr/lib/llvm-18/bin/FileCheck ${VENV_DIR}/bin/FileCheck
+    # Make FileCheck (from system llvm-21) and clang-23, llvm-symbolizer (from TheRock) accessible in VENV
+    ln -s /usr/lib/llvm-21/bin/FileCheck ${VENV_DIR}/bin/FileCheck
     # TODO(sjain-stanford): clang-tidy from TheRock segfaults. Use system clang-tidy instead.
     # ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-tidy ${VENV_DIR}/bin/clang-tidy
     ln -s ${THEROCK_DIR}/lib/llvm/bin/clang-23 ${VENV_DIR}/bin/clang-23
