@@ -39,6 +39,7 @@ RUN apt-get update && \
     git \
     git-lfs \
     gnupg \
+    jq \
     lcov \
     lld \
     ninja-build \
