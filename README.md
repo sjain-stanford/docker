@@ -93,6 +93,31 @@ docker run --rm -it -v "$PWD:$PWD" -w "$PWD" ubuntu:26.04 bash
 Mounting the host Docker socket grants broad control over the host daemon, so only
 use this with trusted dev containers and workloads.
 
+### Host AMD GPU access
+
+The launch scripts expose the host AMD GPUs by default by passing `/dev/kfd` and
+the `/dev/dri/*` character devices to Docker. Disable those mappings when a
+workload should see only simulated GPUs, such as when testing rocjitsu:
+
+```
+DOCKER_ENABLE_AMD_GPU=0 AMD_ARCH=gfx950 /path/to/docker/run_docker.sh
+```
+
+This removes access to the physical GPUs without removing the ROCm compiler,
+HIP runtime, HSA runtime, or other userspace libraries from the container. Set
+`AMD_ARCH` explicitly to select the TheRock distribution used to compile and
+run the simulated target.
+
+Inside the container, verify that the physical GPU device nodes are absent:
+
+```
+test ! -e /dev/kfd
+test ! -e /dev/dri
+```
+
+The option also applies to `exec_docker.sh` and `exec_docker_ci.sh`. The default
+is `DOCKER_ENABLE_AMD_GPU=1` for backward compatibility.
+
 ### GPU architecture selection
 
 The launch scripts pass `AMD_ARCH` into the container so `entrypoint.sh` can
