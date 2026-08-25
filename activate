@@ -47,6 +47,16 @@ deactivate () {
 
     unset DOCKER_CACHE_DIR
     unset THEROCK_DIR
+    if [ -n "${_OLD_VIRTUAL_ROCM_PATH_SET:-}" ] ; then
+        if [ "${_OLD_VIRTUAL_ROCM_PATH_SET}" = "1" ] ; then
+            ROCM_PATH="${_OLD_VIRTUAL_ROCM_PATH:-}"
+            export ROCM_PATH
+        else
+            unset ROCM_PATH
+        fi
+        unset _OLD_VIRTUAL_ROCM_PATH
+        unset _OLD_VIRTUAL_ROCM_PATH_SET
+    fi
     unset VIRTUAL_ENV
     unset VIRTUAL_ENV_PROMPT
     if [ ! "${1:-}" = "nondestructive" ] ; then
@@ -62,6 +72,17 @@ deactivate nondestructive
 export DOCKER_CACHE_DIR=${DOCKER_CACHE_BASE_DIR}/.cache/docker
 export THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 export VIRTUAL_ENV=${DOCKER_CACHE_DIR}/venv
+
+# Make the deferred TheRock install discoverable by ROCm-aware CMake projects.
+# PATH exposes tools for ordinary shell lookup, but projects such as rocjitsu
+# deliberately constrain compiler and runtime-library discovery to ROCM_PATH.
+if [ -n "${ROCM_PATH:-}" ] ; then
+    _OLD_VIRTUAL_ROCM_PATH="${ROCM_PATH:-}"
+    _OLD_VIRTUAL_ROCM_PATH_SET=1
+else
+    _OLD_VIRTUAL_ROCM_PATH_SET=0
+fi
+export ROCM_PATH=${THEROCK_DIR}
 
 # save old PATH and re-export
 _OLD_VIRTUAL_PATH="${PATH}"
