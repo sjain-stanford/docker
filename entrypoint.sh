@@ -8,21 +8,21 @@ VENV_DIR=${DOCKER_CACHE_DIR}/venv
 THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 
 # Version pins
-THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-7.14.0a20260529}"
+THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-10.1.0a20260825}"
 AMD_ARCH="${AMD_ARCH:-gfx94X}"
 
 case "${AMD_ARCH,,}" in
   gfx94x | gfx942)
-    THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu"
+    THEROCK_DIST="therock-dist-linux-gfx94X-dcgpu-tests"
     ;;
   gfx950)
-    THEROCK_DIST="therock-dist-linux-gfx950-dcgpu"
+    THEROCK_DIST="therock-dist-linux-gfx950-dcgpu-tests"
     ;;
   gfx110x | gfx1100 | gfx1101 | gfx1102 | gfx1103)
-    THEROCK_DIST="therock-dist-linux-gfx110X-all"
+    THEROCK_DIST="therock-dist-linux-gfx110X-all-tests"
     ;;
   gfx120x | gfx1200 | gfx1201)
-    THEROCK_DIST="therock-dist-linux-gfx120X-all"
+    THEROCK_DIST="therock-dist-linux-gfx120X-all-tests"
     ;;
   *)
     echo "ERROR: Unsupported architecture: $AMD_ARCH" >&2
@@ -47,14 +47,10 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     # Install TheRock (ROCm/HIP) for the selected GPU family.
     echo "[entrypoint.sh] Downloading TheRock (ROCm/HIP) prebuilt distribution '${THEROCK_DIST}' at tag '${THEROCK_GIT_TAG}'..."
     mkdir -p ${THEROCK_DIR}
-    THEROCK_CDN_URL="https://rocm.nightlies.amd.com/tarball/${THEROCK_TAR}"
-    THEROCK_S3_URL="https://therock-nightly-tarball.s3.us-east-2.amazonaws.com/${THEROCK_TAR}"
+    THEROCK_CDN_URL="https://nightly.repo.amd.com/rocm/core/tarball/${THEROCK_TAR}"
     aria2c -x 16 -s 16 --max-tries=10 --retry-wait=5 \
            -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
-           ${THEROCK_CDN_URL} || \
-    aria2c -x 16 -s 16 --max-tries=10 --retry-wait=5 \
-           -d ${THEROCK_DIR} -o ${THEROCK_TAR} \
-           ${THEROCK_S3_URL}
+           ${THEROCK_CDN_URL}
     echo "[entrypoint.sh] Extracting TheRock (ROCm/HIP) prebuilt distribution..."
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
