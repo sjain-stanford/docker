@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Bind mounts: only mount what the dev workflow actually needs.
-# Sensitive paths (.bash_history, .docker) are intentionally excluded.
+# Sensitive directories such as .docker are intentionally excluded.
 # Read-write mounts
 DOCKER_RUN_MOUNT_OPTS="${DOCKER_RUN_MOUNT_OPTS:-}"
 DOCKER_RUN_ENV_OPTS="${DOCKER_RUN_ENV_OPTS:-}"
@@ -16,6 +16,7 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 # .bashrc is mounted read-write so `entrypoint.sh` can append its
 # VENV-activation stanza (see entrypoint.sh).
 [ -e "${HOME}/.bashrc" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc"
+[ -e "${HOME}/.bash_history" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_history:${HOME}/.bash_history"
 # Read-only mounts
 [ -e "${HOME}/.ssh" ]                && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.ssh:${HOME}/.ssh:ro"
 [ -e "${HOME}/.gitconfig" ]          && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gitconfig:${HOME}/.gitconfig:ro"
