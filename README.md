@@ -26,24 +26,25 @@ loopback-only port publication when launching the development container:
 DOCKER_ENABLE_PEANUT_REVIEW_WEB=1 /path/to/docker/run_docker.sh
 ```
 
-Then start peanut-review inside the container on the published port. It must
-bind the container interface rather than container-local loopback:
+Then start peanut-review inside the container with its web UI launcher. The
+launcher detects Docker and binds the container interface rather than
+container-local loopback:
 
 ```bash
-tools/peanut-review/bin/peanut-review serve \
-  --root /path/to/review-root \
-  --host 0.0.0.0 \
-  --port "$PEANUT_REVIEW_PORT"
+PR_ROOT=~/claude-workspace/.cache/peanut-review/sessions \
+PR_PORT="$PEANUT_REVIEW_PORT" \
+  tools/peanut-review/bin/peanut_review_serve.sh
 ```
 
 The default port is `27183`. VSCode can auto-forward that remote-host port, or
 it can be forwarded from the **Ports** view. Open
-`http://localhost:27183/` on the local laptop. The `--root` path must match the
+`http://localhost:27183/` on the local laptop. `PR_ROOT` must match the
 `reviewRoot` used when creating the peanut-review sessions.
 
-Do not set `--base-url` for direct port forwarding. That option only rewrites
-generated links when a reverse proxy mounts peanut-review under a path prefix
-and strips the prefix before forwarding requests to the server.
+Do not set `PR_BASE_URL` or pass `--base-url` for direct port forwarding. That
+option only rewrites generated links when a reverse proxy mounts peanut-review
+under a path prefix and strips the prefix before forwarding requests to the
+server.
 
 Set `PEANUT_REVIEW_PORT` before launching the container to use another port:
 
