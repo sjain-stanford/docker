@@ -12,6 +12,7 @@ source "${SCRIPT_DIR}/build_docker.sh"
 
 docker run -it \
            ${DOCKER_RUN_MOUNT_OPTS} \
+           ${DOCKER_RUN_PORT_OPTS} \
            ${DOCKER_RUN_DEVICE_OPTS} \
            ${DOCKER_RUN_BWRAP_OPTS} \
            ${DOCKER_RUN_ENV_OPTS} \

@@ -5,6 +5,7 @@
 # Read-write mounts
 DOCKER_RUN_MOUNT_OPTS="${DOCKER_RUN_MOUNT_OPTS:-}"
 DOCKER_RUN_ENV_OPTS="${DOCKER_RUN_ENV_OPTS:-}"
+DOCKER_RUN_PORT_OPTS="${DOCKER_RUN_PORT_OPTS:-}"
 DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.claude" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude:${HOME}/.claude"
 [ -e "${HOME}/.claude.json" ]        && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude.json:${HOME}/.claude.json"
@@ -25,6 +26,24 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 [ -e "${HOME}/.local" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local:${HOME}/.local:ro"
 [ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
 [ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
+
+# Peanut-review web UI forwarding.
+# VSCode Remote SSH can only discover ports listening on the SSH host, not
+# ports isolated in the container's network namespace. Opt in to publishing a
+# fixed container port on the host's loopback interface so VSCode can forward
+# it without exposing the web UI on the host's external interfaces.
+DOCKER_ENABLE_PEANUT_REVIEW_WEB="${DOCKER_ENABLE_PEANUT_REVIEW_WEB:-0}"
+PEANUT_REVIEW_PORT="${PEANUT_REVIEW_PORT:-27183}"
+if [ "${DOCKER_ENABLE_PEANUT_REVIEW_WEB}" = "1" ]; then
+  if ! [[ "${PEANUT_REVIEW_PORT}" =~ ^[0-9]{1,5}$ ]] \
+      || (( 10#${PEANUT_REVIEW_PORT} < 1 || 10#${PEANUT_REVIEW_PORT} > 65535 )); then
+    echo "ERROR: PEANUT_REVIEW_PORT must be an integer from 1 through 65535" >&2
+    exit 1
+  fi
+  PEANUT_REVIEW_PORT=$((10#${PEANUT_REVIEW_PORT}))
+  DOCKER_RUN_PORT_OPTS+=" -p 127.0.0.1:${PEANUT_REVIEW_PORT}:${PEANUT_REVIEW_PORT}"
+  DOCKER_RUN_ENV_OPTS+=" -e PEANUT_REVIEW_PORT=${PEANUT_REVIEW_PORT}"
+fi
 
 # Host Docker API compatibility.
 # Export the host daemon API version before running host-side docker commands
@@ -136,5 +155,6 @@ fi
 # `exec_docker_ci.sh` intentionally uses only device options from this file.
 export DOCKER_RUN_MOUNT_OPTS
 export DOCKER_RUN_ENV_OPTS
+export DOCKER_RUN_PORT_OPTS
 export DOCKER_RUN_DEVICE_OPTS
 export DOCKER_RUN_BWRAP_OPTS

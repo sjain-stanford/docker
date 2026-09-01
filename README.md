@@ -16,6 +16,46 @@ This launches an interactive shell within the container. All code in the current
 
 To use VSCode's integrated debugger with the container, we recommend using the "Dev Containers" extension. Simply `run_docker.sh` to launch the container, then press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the command palette and select "Dev Containers: Attach to Running Container...". See [this](https://code.visualstudio.com/docs/devcontainers/attach-container) for details.
 
+### Peanut-review web UI over Remote SSH
+
+VSCode Remote SSH discovers ports on the SSH host, while services started in a
+Docker container normally listen in a separate network namespace. Opt in to a
+loopback-only port publication when launching the development container:
+
+```bash
+DOCKER_ENABLE_PEANUT_REVIEW_WEB=1 /path/to/docker/run_docker.sh
+```
+
+Then start peanut-review inside the container on the published port. It must
+bind the container interface rather than container-local loopback:
+
+```bash
+tools/peanut-review/bin/peanut-review serve \
+  --root /path/to/review-root \
+  --host 0.0.0.0 \
+  --port "$PEANUT_REVIEW_PORT"
+```
+
+The default port is `27183`. VSCode can auto-forward that remote-host port, or
+it can be forwarded from the **Ports** view. Open
+`http://localhost:27183/` on the local laptop. The `--root` path must match the
+`reviewRoot` used when creating the peanut-review sessions.
+
+Do not set `--base-url` for direct port forwarding. That option only rewrites
+generated links when a reverse proxy mounts peanut-review under a path prefix
+and strips the prefix before forwarding requests to the server.
+
+Set `PEANUT_REVIEW_PORT` before launching the container to use another port:
+
+```bash
+DOCKER_ENABLE_PEANUT_REVIEW_WEB=1 PEANUT_REVIEW_PORT=37183 \
+  /path/to/docker/run_docker.sh
+```
+
+The published host socket is deliberately bound to `127.0.0.1`; the web UI is
+not exposed on the SSH host's external network interfaces. A Dockerfile
+`EXPOSE` instruction is neither needed nor sufficient for this forwarding.
+
 ### Non-interactive usage (CI)
 
 To execute commands within the container in batch mode (non-interactive):
