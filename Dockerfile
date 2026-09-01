@@ -45,6 +45,7 @@ RUN apt-get update && \
     ninja-build \
     pre-commit \
     python3-dev \
+    python3-pygments \
     python3-venv \
     ripgrep \
     vim \

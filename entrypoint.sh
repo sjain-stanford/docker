@@ -10,6 +10,7 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 # Version pins
 THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-10.1.0a20260825}"
 AMD_ARCH="${AMD_ARCH:-gfx94X}"
+VENV_DEPS_VERSION=1
 
 case "${AMD_ARCH,,}" in
   gfx94x | gfx942)
@@ -55,10 +56,10 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
     tar -xf ${THEROCK_DIR}/${THEROCK_TAR} -C ${THEROCK_DIR}
     rm -f ${THEROCK_DIR}/${THEROCK_TAR}
 
-    # Install python virtual env and dependencies
-    echo "[entrypoint.sh] Setting up python venv and installing pip deps..."
+    # Install the Python virtual env. Dependencies are cached separately below
+    # so adding a package does not require downloading TheRock again.
+    echo "[entrypoint.sh] Setting up python venv..."
     python3 -m venv ${VENV_DIR}
-    ${VENV_DIR}/bin/pip install lit
 
     # Make FileCheck (from system llvm-21) and clang-23, llvm-symbolizer (from TheRock) accessible in VENV
     ln -s /usr/lib/llvm-21/bin/FileCheck ${VENV_DIR}/bin/FileCheck
@@ -76,6 +77,15 @@ if [ ! -f "${DOCKER_CACHE_DIR}/.install_complete_${CACHE_KEY}" ]; then
 
 else
     echo "[entrypoint.sh] Cache found for '${CACHE_KEY}' at '${DOCKER_CACHE_DIR}', skipped installation..."
+fi
+
+# Keep Python dependencies independently versioned from the much larger
+# TheRock cache. Increment VENV_DEPS_VERSION whenever this package set changes.
+VENV_DEPS_MARKER="${VENV_DIR}/.install_complete_deps_${VENV_DEPS_VERSION}"
+if [ ! -f "${VENV_DEPS_MARKER}" ]; then
+    echo "[entrypoint.sh] Installing python venv dependencies..."
+    ${VENV_DIR}/bin/pip install cgen lit pytest
+    touch "${VENV_DEPS_MARKER}"
 fi
 
 # Check if stdin is attached to a TTY (true for interactive run, false otherwise).
