@@ -10,7 +10,7 @@ THEROCK_DIR=${DOCKER_CACHE_DIR}/therock
 # Version pins
 THEROCK_GIT_TAG="${THEROCK_GIT_TAG:-10.1.0a20260825}"
 AMD_ARCH="${AMD_ARCH:-gfx94X}"
-VENV_DEPS_VERSION=1
+VENV_DEPS_VERSION=2
 
 case "${AMD_ARCH,,}" in
   gfx94x | gfx942)
@@ -84,7 +84,7 @@ fi
 VENV_DEPS_MARKER="${VENV_DIR}/.install_complete_deps_${VENV_DEPS_VERSION}"
 if [ ! -f "${VENV_DEPS_MARKER}" ]; then
     echo "[entrypoint.sh] Installing python venv dependencies..."
-    ${VENV_DIR}/bin/pip install cgen lit pytest
+    ${VENV_DIR}/bin/pip install cgen lit pygments pytest
     touch "${VENV_DEPS_MARKER}"
 fi
 
