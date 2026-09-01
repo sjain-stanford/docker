@@ -35,6 +35,8 @@ DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
 DOCKER_ENABLE_PEANUT_REVIEW_WEB="${DOCKER_ENABLE_PEANUT_REVIEW_WEB:-0}"
 PEANUT_REVIEW_PORT="${PEANUT_REVIEW_PORT:-27183}"
 if [ "${DOCKER_ENABLE_PEANUT_REVIEW_WEB}" = "1" ]; then
+  echo "WARNING: Peanut-review has no web UI authentication." >&2
+  echo "Only enable port forwarding on a single-user or fully trusted SSH host." >&2
   if ! [[ "${PEANUT_REVIEW_PORT}" =~ ^[0-9]{1,5}$ ]] \
       || (( 10#${PEANUT_REVIEW_PORT} < 1 || 10#${PEANUT_REVIEW_PORT} > 65535 )); then
     echo "ERROR: PEANUT_REVIEW_PORT must be an integer from 1 through 65535" >&2

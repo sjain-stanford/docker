@@ -18,6 +18,12 @@ To use VSCode's integrated debugger with the container, we recommend using the "
 
 ### Peanut-review web UI over Remote SSH
 
+> **Security:** Only enable this workflow on a single-user SSH host or one
+> whose local users you fully trust. Peanut-review does not authenticate web UI
+> clients. Although the published socket is restricted to host loopback, any
+> local user can connect to it and use the server's access to review sessions,
+> agents, and GitHub credentials.
+
 VSCode Remote SSH discovers ports on the SSH host, while services started in a
 Docker container normally listen in a separate network namespace. Opt in to a
 loopback-only port publication when launching the development container:
