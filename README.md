@@ -137,8 +137,6 @@ and `gfx120X`/`gfx1200`/`gfx1201`. If no ROCm GPU is detected and
 > [!NOTE]
 > To keep the docker image size small (<2GB), the installation of large libraries (e.g. ROCm) is deferred to container launch through an `entrypoint.sh`. This installation is cached locally at `${PWD}/.cache/docker` so re-runs are instantaneous. The cache is automatically invalidated when the TheRock version or selected distribution changes. To force a clean reinstall, remove the `${PWD}/.cache/docker` directory and re-run.
 
-Happy development!
-
 ### Peanut-review web UI over Remote SSH
 
 > **Security:** Only enable this workflow on a single-user SSH host or one
