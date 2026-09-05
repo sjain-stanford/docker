@@ -66,15 +66,16 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
     rm -rf /var/lib/apt/lists/* /tmp/githubcli-archive-keyring.gpg
 
 # Install Node.js and Codex CLI
-# https://help.openai.com/en/articles/11096431-openai-codex-ci-getting-started
+# https://learn.chatgpt.com/docs/codex/cli
 ARG NODE_MAJOR=22
+ARG CODEX_VERSION=0.153.4
 RUN mkdir -p -m 755 /etc/apt/keyrings && \
     wget -nv -O /tmp/nodesource-repo.gpg.key https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key && \
     gpg --batch --dearmor -o /etc/apt/keyrings/nodesource.gpg /tmp/nodesource-repo.gpg.key && \
     echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_${NODE_MAJOR}.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list > /dev/null && \
     apt-get update && \
     apt-get install -y nodejs && \
-    npm install -g @openai/codex && \
+    npm install -g "@openai/codex@${CODEX_VERSION}" && \
     npm cache clean --force && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/nodesource-repo.gpg.key
