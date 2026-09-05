@@ -14,6 +14,10 @@ Switch over to the development repo and launch an interactive container:
 
 This launches an interactive shell within the container. All code in the current directory should be visible (volume mounted) within the container at the same paths, preserving the source structure to keep builds within container in sync with utilities outside (e.g. `compile_commands.json`, C++ Intellisense, gcov-viewer etc.). The container also mounts user's home directory so that their configuration works as-is within the container (e.g. `.bashrc`, `.gitconfig` etc). The container automatically sources its virtual environment in the interactive shell, which should reflect in `$PATH` and `$LD_LIBRARY_PATH` appropriately. This may be manually disabled with `deactivate` and re-enabled with `source activate`.
 
+The Codex CLI version is pinned by `CODEX_VERSION` in the Dockerfile. Update
+that build argument and rebuild the image to upgrade Codex; host-side Codex
+updates do not change the executable baked into an existing image.
+
 To use VSCode's integrated debugger with the container, we recommend using the "Dev Containers" extension. Simply `run_docker.sh` to launch the container, then press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the command palette and select "Dev Containers: Attach to Running Container...". See [this](https://code.visualstudio.com/docs/devcontainers/attach-container) for details.
 
 ### Non-interactive usage (CI)
