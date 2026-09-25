@@ -68,7 +68,7 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
 # Install Node.js and Codex CLI
 # https://learn.chatgpt.com/docs/codex/cli
 ARG NODE_MAJOR=22
-ARG CODEX_VERSION=0.156.1
+ARG CODEX_VERSION=0.157.0
 RUN mkdir -p -m 755 /etc/apt/keyrings && \
     wget -nv -O /tmp/nodesource-repo.gpg.key https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key && \
     gpg --batch --dearmor -o /etc/apt/keyrings/nodesource.gpg /tmp/nodesource-repo.gpg.key && \
