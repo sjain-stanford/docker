@@ -80,6 +80,23 @@ RUN mkdir -p -m 755 /etc/apt/keyrings && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/nodesource-repo.gpg.key
 
+# Install Cursor Agent outside the read-only ~/.local host mount.
+# Package URL follows the official installer at https://cursor.com/install.
+ARG CURSOR_AGENT_VERSION=2026.09.28-64d2043
+RUN case "$(dpkg --print-architecture)" in \
+      amd64) cursor_arch=x64 ;; \
+      arm64) cursor_arch=arm64 ;; \
+      *) echo "Unsupported Cursor Agent architecture" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL "https://downloads.cursor.com/lab/${CURSOR_AGENT_VERSION}/linux/${cursor_arch}/agent-cli-package.tar.gz" \
+      -o /tmp/cursor-agent.tar.gz && \
+    mkdir -p /opt/cursor-agent && \
+    tar -xzf /tmp/cursor-agent.tar.gz --strip-components=1 -C /opt/cursor-agent && \
+    ln -s /opt/cursor-agent/cursor-agent /usr/local/bin/cursor-agent && \
+    ln -s /opt/cursor-agent/cursor-agent /usr/local/bin/agent && \
+    cursor-agent --version && \
+    rm -f /tmp/cursor-agent.tar.gz
+
 # Install bazel
 ARG ARCH=x86_64
 ARG BAZEL_VERSION=6.4.0
