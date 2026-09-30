@@ -18,6 +18,13 @@ The Codex CLI version is pinned by `CODEX_VERSION` in the Dockerfile. Update
 that build argument and rebuild the image to upgrade Codex; host-side Codex
 updates do not change the executable baked into an existing image.
 
+Cursor Agent is installed in `/opt/cursor-agent` and available as both
+`cursor-agent` and `agent`. Run `cursor-agent login` to authenticate, then
+`cursor-agent` to start a session. Its version is pinned by
+`CURSOR_AGENT_VERSION` in the Dockerfile; update that argument and rebuild
+the image to upgrade. Installing outside the home directory keeps the CLI
+accessible when the launch scripts mount `~/.local` read-only.
+
 To use VSCode's integrated debugger with the container, we recommend using the "Dev Containers" extension. Simply `run_docker.sh` to launch the container, then press Ctrl+Shift+P (or Cmd+Shift+P on macOS) to open the command palette and select "Dev Containers: Attach to Running Container...". See [this](https://code.visualstudio.com/docs/devcontainers/attach-container) for details.
 
 ### Non-interactive usage (CI)
