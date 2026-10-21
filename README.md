@@ -23,7 +23,7 @@ on the host and bind mount it at the same paths in the container, so first use
 inside Docker persists across container removal:
 
 - Directories: `~/.claude`, `~/.codex`, `~/.local/state/claude`, `~/.cache`,
-  `~/.cursor`, and `~/.cursor-server`.
+  `~/.cursor`, `~/.cursor-server`, and `~/.config/cursor`.
 - Files: `~/.claude.json` starts as `{}` and `~/.bash_history` starts empty.
 
 Only missing state is initialized. New directories have mode `0700` and new
@@ -32,8 +32,10 @@ conflicting path type or failure to create state stops the launch.
 
 Shell configuration and read-only host configuration are mounted only when
 present. In particular, a missing `~/.bashrc` is left to the image's defaults.
-The writable `~/.local/state/claude` mount is available inside the read-only
-`~/.local` mount. `exec_docker_ci.sh` does not prepare or mount home state.
+Writable child mounts provide Claude state under `~/.local/state/claude` and
+Cursor authentication under `~/.config/cursor`, while the parent `~/.local`
+and `~/.config` mounts stay read-only. `exec_docker_ci.sh` does not prepare or
+mount home state.
 
 Existing containers must be recreated to pick up new mounts. Copy any
 container-only state to the corresponding host paths before removing the old

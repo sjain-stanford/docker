@@ -28,7 +28,7 @@ init_docker_home_mounts() {
   # Create writable state on the host before Docker can create root-owned
   # mount sources or applications can leave state only in the container.
   # A private umask also protects newly created parents of nested state paths.
-  for path in .claude .codex .local/state/claude .cache .cursor .cursor-server; do
+  for path in .claude .codex .local/state/claude .cache .cursor .cursor-server .config/cursor; do
     (umask 077; mkdir -p -m 700 "${HOME}/${path}") || return 1
     DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/${path}:${HOME}/${path}"
   done
@@ -41,8 +41,8 @@ init_docker_home_mounts() {
     DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc"
   fi
 
-  # Optional host configuration stays read-only. The writable child mount
-  # above lets Claude save state even though ~/.local is read-only.
+  # Optional host configuration stays read-only. The writable child mounts
+  # let Claude save state under ~/.local and Cursor save tokens under ~/.config.
   for path in .ssh .gitconfig .config .gnupg .local .bash_aliases .bash_profile; do
     if [ -e "${HOME}/${path}" ]; then
       DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/${path}:${HOME}/${path}:ro"

@@ -16,6 +16,7 @@ STATE_DIRS = (
     ".cache",
     ".cursor",
     ".cursor-server",
+    ".config/cursor",
 )
 STATE_FILES = {".claude.json": "{}\n", ".bash_history": ""}
 
@@ -95,6 +96,7 @@ class HomeMountTests(unittest.TestCase):
                     self.assertEqual(stat.S_IMODE(path.stat().st_mode), 0o600)
                     self.assertIn(self.mount(name), mounts)
                 self.assertIn(self.mount(".local", readonly=True), mounts)
+                self.assertIn(self.mount(".config", readonly=True), mounts)
                 self.assertEqual(
                     stat.S_IMODE((self.host_home / ".local/state").stat().st_mode),
                     0o700,
@@ -102,7 +104,6 @@ class HomeMountTests(unittest.TestCase):
                 for name in (
                     ".bashrc",
                     ".ssh",
-                    ".config",
                     ".gitconfig",
                     ".gnupg",
                     ".bash_aliases",
@@ -153,6 +154,22 @@ class HomeMountTests(unittest.TestCase):
         ):
             self.assertIn(self.mount(name, readonly=True), mounts)
         self.assertIn(self.mount(".local/state/claude"), mounts)
+        self.assertIn(self.mount(".config/cursor"), mounts)
+
+    def test_cursor_authentication_directory_is_persisted(self):
+        config = self.host_home / ".config"
+        config.mkdir(mode=0o750)
+        mounts = self.launch()
+        auth_dir = config / "cursor"
+        self.assertTrue(auth_dir.is_dir())
+        self.assertIn(self.mount(".config/cursor"), mounts)
+        self.assertIn(self.mount(".config", readonly=True), mounts)
+        self.assertEqual(stat.S_IMODE(config.stat().st_mode), 0o750)
+        self.assertEqual(stat.S_IMODE(auth_dir.stat().st_mode), 0o700)
+        auth_file = auth_dir / "auth.json"
+        auth_file.write_text('{"test-token": "placeholder"}\n')
+        self.launch()
+        self.assertEqual(auth_file.read_text(), '{"test-token": "placeholder"}\n')
 
     def test_conflicting_path_types_stop_before_docker(self):
         for name in (*STATE_DIRS, *STATE_FILES):
