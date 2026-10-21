@@ -12,11 +12,32 @@ Switch over to the development repo and launch an interactive container:
 /path/to/docker/run_docker.sh
 ```
 
-This launches an interactive shell within the container. All code in the current directory should be visible (volume mounted) within the container at the same paths, preserving the source structure to keep builds within container in sync with utilities outside (e.g. `compile_commands.json`, C++ Intellisense, gcov-viewer etc.). The container also mounts user's home directory so that their configuration works as-is within the container (e.g. `.bashrc`, `.gitconfig` etc). The container automatically sources its virtual environment in the interactive shell, which should reflect in `$PATH` and `$LD_LIBRARY_PATH` appropriately. This may be manually disabled with `deactivate` and re-enabled with `source activate`.
+This launches an interactive shell within the container. All code in the current directory should be visible (volume mounted) within the container at the same paths, preserving the source structure to keep builds within container in sync with utilities outside (e.g. `compile_commands.json`, C++ Intellisense, gcov-viewer etc.). The container also mounts selected paths from the user's home directory so that their configuration works as-is within the container (e.g. `.bashrc`, `.gitconfig` etc). The container automatically sources its virtual environment in the interactive shell, which should reflect in `$PATH` and `$LD_LIBRARY_PATH` appropriately. This may be manually disabled with `deactivate` and re-enabled with `source activate`.
 
 The Codex CLI version is pinned by `CODEX_VERSION` in the Dockerfile. Update
 that build argument and rebuild the image to upgrade Codex; host-side Codex
 updates do not change the executable baked into an existing image.
+
+The local launchers (`run_docker.sh` and `exec_docker.sh`) prepare writable state
+on the host and bind mount it at the same paths in the container, so first use
+inside Docker persists across container removal:
+
+- Directories: `~/.claude`, `~/.codex`, `~/.local/state/claude`, `~/.cache`,
+  `~/.cursor`, and `~/.cursor-server`.
+- Files: `~/.claude.json` starts as `{}` and `~/.bash_history` starts empty.
+
+Only missing state is initialized. New directories have mode `0700` and new
+files have mode `0600`; existing contents and permissions are preserved. A
+conflicting path type or failure to create state stops the launch.
+
+Shell configuration and read-only host configuration are mounted only when
+present. In particular, a missing `~/.bashrc` is left to the image's defaults.
+The writable `~/.local/state/claude` mount is available inside the read-only
+`~/.local` mount. `exec_docker_ci.sh` does not prepare or mount home state.
+
+Existing containers must be recreated to pick up new mounts. Copy any
+container-only state to the corresponding host paths before removing the old
+container, preserving any existing host state.
 
 Cursor Agent is installed in `/opt/cursor-agent` and available as both
 `cursor-agent` and `agent`. Run `cursor-agent login` to authenticate, then

@@ -2,30 +2,53 @@
 
 # Bind mounts: only mount what the dev workflow actually needs.
 # Sensitive directories such as .docker are intentionally excluded.
-# Read-write mounts
 DOCKER_RUN_MOUNT_OPTS="${DOCKER_RUN_MOUNT_OPTS:-}"
 DOCKER_RUN_ENV_OPTS="${DOCKER_RUN_ENV_OPTS:-}"
 DOCKER_RUN_PORT_OPTS="${DOCKER_RUN_PORT_OPTS:-}"
-DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
-[ -e "${HOME}/.claude" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude:${HOME}/.claude"
-[ -e "${HOME}/.claude.json" ]        && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.claude.json:${HOME}/.claude.json"
-[ -e "${HOME}/.codex" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.codex:${HOME}/.codex"
-[ -e "${HOME}/.local/state/claude" ] && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local/state/claude:${HOME}/.local/state/claude"
-[ -e "${HOME}/.cache" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cache:${HOME}/.cache"
-[ -e "${HOME}/.cursor" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor:${HOME}/.cursor"
-[ -e "${HOME}/.cursor-server" ]      && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.cursor-server:${HOME}/.cursor-server"
-# .bashrc is mounted read-write so `entrypoint.sh` can append its
-# VENV-activation stanza (see entrypoint.sh).
-[ -e "${HOME}/.bashrc" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc"
-[ -e "${HOME}/.bash_history" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_history:${HOME}/.bash_history"
-# Read-only mounts
-[ -e "${HOME}/.ssh" ]                && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.ssh:${HOME}/.ssh:ro"
-[ -e "${HOME}/.gitconfig" ]          && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gitconfig:${HOME}/.gitconfig:ro"
-[ -e "${HOME}/.config" ]             && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.config:${HOME}/.config:ro"
-[ -e "${HOME}/.gnupg" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.gnupg:${HOME}/.gnupg:ro"
-[ -e "${HOME}/.local" ]              && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.local:${HOME}/.local:ro"
-[ -e "${HOME}/.bash_aliases" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_aliases:${HOME}/.bash_aliases:ro"
-[ -e "${HOME}/.bash_profile" ]       && DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bash_profile:${HOME}/.bash_profile:ro"
+
+mount_home_state_file() {
+  local path="${HOME}/$1"
+  local initial_content="$2"
+  if [ ! -e "${path}" ] && [ ! -L "${path}" ]; then
+    # Never truncate an existing file, including during concurrent launches.
+    (umask 077; set -o noclobber; printf '%s' "${initial_content}" > "${path}") || return 1
+  fi
+  if [ ! -f "${path}" ]; then
+    echo "ERROR: Expected a regular state file: ${path}" >&2
+    return 1
+  fi
+  DOCKER_RUN_MOUNT_OPTS+=" -v ${path}:${path}"
+}
+
+# Only local launchers call this; CI does not use home mounts.
+init_docker_home_mounts() {
+  local path
+  DOCKER_RUN_MOUNT_OPTS+=" -v ${PWD}:${PWD}"
+
+  # Create writable state on the host before Docker can create root-owned
+  # mount sources or applications can leave state only in the container.
+  # A private umask also protects newly created parents of nested state paths.
+  for path in .claude .codex .local/state/claude .cache .cursor .cursor-server; do
+    (umask 077; mkdir -p -m 700 "${HOME}/${path}") || return 1
+    DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/${path}:${HOME}/${path}"
+  done
+  mount_home_state_file .claude.json $'{}\n' || return 1
+  mount_home_state_file .bash_history '' || return 1
+
+  # Import an existing shell configuration read-write for entrypoint.sh's
+  # VENV stanza. An empty placeholder would hide the image's default .bashrc.
+  if [ -e "${HOME}/.bashrc" ]; then
+    DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/.bashrc:${HOME}/.bashrc"
+  fi
+
+  # Optional host configuration stays read-only. The writable child mount
+  # above lets Claude save state even though ~/.local is read-only.
+  for path in .ssh .gitconfig .config .gnupg .local .bash_aliases .bash_profile; do
+    if [ -e "${HOME}/${path}" ]; then
+      DOCKER_RUN_MOUNT_OPTS+=" -v ${HOME}/${path}:${HOME}/${path}:ro"
+    fi
+  done
+}
 
 # Peanut-review web UI forwarding.
 # VSCode Remote SSH can only discover ports listening on the SSH host, not

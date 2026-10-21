@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Initialize options for docker run
 source "${SCRIPT_DIR}/init_docker.sh"
+init_docker_home_mounts
 
 # Build docker image if not already built
 source "${SCRIPT_DIR}/build_docker.sh"
